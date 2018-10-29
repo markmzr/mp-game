@@ -3,10 +3,10 @@ import org.joml.Vector3f;
 
 public class GL2DObject {
 
-    private Model model;
-    private Shader shader;
-    private Texture texture;
-    private Matrix4f position;
+    protected Model model;
+    protected Shader shader;
+    protected Texture texture;
+    protected Matrix4f position;
 
     public GL2DObject(float[] vertices, String textureFilename) {
         model = new Model(vertices);

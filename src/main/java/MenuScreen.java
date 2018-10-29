@@ -3,7 +3,7 @@ import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
-public class MainMenu implements Screen {
+public class MenuScreen implements Screen {
 
     private GL2DObject background;
     private GL2DObject logo;
@@ -15,7 +15,7 @@ public class MainMenu implements Screen {
     private double moveUpMaxTime;
     private double moveDownMaxTime;
 
-    public MainMenu() {
+    public MenuScreen() {
         float[] backgroundVertices = new float[] {
                 -6.68f, 12.68f, 0f,
                 1.0f, 12.68f, 0f,
@@ -47,7 +47,7 @@ public class MainMenu implements Screen {
                 -0.2f, -0.06f, 0f,
                 -0.2f, 0.06f, 0f,
         };
-        newGame = new GLButton(newGameVertices, "New Game.png", 0.4, 0.6, 0.47, 0.53);
+        newGame = new GLButton(newGameVertices, "New Game.png", "New Game Highlighted.png", 0.4, 0.6, 0.47, 0.53);
 
         float[] quitVertices = new float[] {
                 -0.2f, -0.18f, 0f,
@@ -58,7 +58,7 @@ public class MainMenu implements Screen {
                 -0.2f, -0.30f, 0f,
                 -0.2f, -0.18f, 0f,
         };
-        quit = new GLButton(quitVertices, "Quit.png", 0.4, 0.6, 0.59, 0.65);
+        quit = new GLButton(quitVertices, "Quit.png", "Quit Highlighted.png", 0.4, 0.6, 0.59, 0.65);
 
         lastTime = 0;
         moveRightMaxTime = 60;
@@ -122,15 +122,31 @@ public class MainMenu implements Screen {
         quit.render();
     }
 
-    public ScreenOption buttonPressed(double cursorXPos, double cursorYPos) {
-        if (newGame.isCursorInRange(cursorXPos, cursorYPos)) {
-            return ScreenOption.SETUP_GAME;
+    public void cursorMoved(double cursorXCoord, double cursorYCoord) {
+        if (newGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
+            newGame.setHighlighted(true);
+        }
+        else {
+            newGame.setHighlighted(false);
         }
 
-        if (quit.isCursorInRange(cursorXPos, cursorYPos)) {
-            return ScreenOption.QUIT;
+        if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
+            quit.setHighlighted(true);
+        }
+        else {
+            quit.setHighlighted(false);
+        }
+    }
+
+    public void buttonPressed(GameState gameState, double cursorXCoord, double cursorYCoord) {
+        if (newGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
+            newGame.setHighlighted(false);
+            gameState.setToSetupScreen();
         }
 
-        return ScreenOption.MAIN_MENU;
+        if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
+            quit.setHighlighted(false);
+            gameState.quitGame();
+        }
     }
 }

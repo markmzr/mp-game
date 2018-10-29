@@ -1,5 +1,6 @@
 public interface Screen {
 
     void render();
-    ScreenOption buttonPressed(double cursorXPos, double cursorYPos);
+    void cursorMoved(double cursorXCoord, double cursorYCoord);
+    void buttonPressed(GameState gameState, double cursorXCoord, double cursorYCoord);
 }

@@ -1,5 +1,6 @@
 import java.nio.*;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
@@ -7,6 +8,8 @@ import org.lwjgl.system.*;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -66,17 +69,33 @@ public class Main {
 
         // Set callbacks
         glfwSetFramebufferSizeCallback(window, resizeWindow);
+        glfwSetCursorPosCallback(window, cursorPosCallback);
         glfwSetMouseButtonCallback(window, mouseButtonCallback);
+
+        // Create cursor
+        IntBuffer x = BufferUtils.createIntBuffer(1);
+        IntBuffer y = BufferUtils.createIntBuffer(1);
+        IntBuffer channels = BufferUtils.createIntBuffer(1);
+        ByteBuffer data = stbi_load("./Textures/Cursor.png", x, y, channels, 4);
+
+        GLFWImage cursor = GLFWImage.create();
+        cursor.width(x.get());
+        cursor.height(y.get());
+        cursor.pixels(data);
+
+        long cursorId = glfwCreateCursor(cursor, 0, 0);
+        glfwSetCursor(window, cursorId);
+        stbi_image_free(data);
     }
 
     private void loop() {
         GL.createCapabilities();
-        gameState = new GameState();
+        gameState = new GameState(window);
 
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            gameState.render(window);
+            gameState.render();
 
             glfwSwapBuffers(window);
             glfwPollEvents();
@@ -96,6 +115,19 @@ public class Main {
         }
     };
 
+    private GLFWCursorPosCallback cursorPosCallback = new GLFWCursorPosCallback() {
+        @Override
+        public void invoke(long window, double cursorXPos, double cursorYPos) {
+            int[] windowWidth = new int[1];
+            int[] windowHeight = new int[1];
+            glfwGetWindowSize(window, windowWidth, windowHeight);
+
+            double cursorXCoord = cursorXPos / windowWidth[0];
+            double cursorYCoord = cursorYPos / windowHeight[0];
+            gameState.cursorMoved(cursorXCoord, cursorYCoord);
+        }
+    };
+
     // Callback for mouse button events
     private GLFWMouseButtonCallback mouseButtonCallback = new GLFWMouseButtonCallback() {
         @Override
@@ -103,6 +135,7 @@ public class Main {
             double[] cursorXPos = new double[1];
             double[] cursorYPos = new double[1];
             glfwGetCursorPos(window, cursorXPos, cursorYPos);
+
 
             int[] windowWidth = new int[1];
             int[] windowHeight = new int[1];

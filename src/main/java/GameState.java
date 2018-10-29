@@ -2,39 +2,49 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
 public class GameState {
 
-    private MainMenu mainMenu;
-    private SetupGame setupGame;
-    private ScreenOption currentScreen;
+    private long glWindow;
+    private MenuScreen menuScreen;
+    private SetupScreen setupScreen;
+    private GameScreen gameScreen;
+    private Screen currentScreen;
 
-    public GameState() {
-        mainMenu = new MainMenu();
-        setupGame = new SetupGame();
-        currentScreen = ScreenOption.MAIN_MENU;
+    public GameState(long glWindow) {
+        this.glWindow = glWindow;
+        menuScreen = new MenuScreen();
+        setupScreen = new SetupScreen();
+        gameScreen = new GameScreen();
+        currentScreen = menuScreen;
     }
 
-    public void render(long window) {
-        switch (currentScreen) {
-            case MAIN_MENU:
-                mainMenu.render();
-                break;
-            case SETUP_GAME:
-                setupGame.render();
-                break;
-            case QUIT:
-                glfwSetWindowShouldClose(window, true);
-        }
+    public void setToMenuScreen() {
+        menuScreen.setBackgroundPosition(setupScreen.getBackgroundPosition());
+        menuScreen.setLastTime(setupScreen.getLastTime());
+        currentScreen = menuScreen;
+    }
+
+    public void setToSetupScreen() {
+        setupScreen.setBackgroundPosition(menuScreen.getBackgroundPosition());
+        setupScreen.setLastTime(menuScreen.getLastTime());
+        currentScreen = setupScreen;
+    }
+
+    public void setToGameScreen() {
+        currentScreen = gameScreen;
+    }
+
+    public void quitGame() {
+        glfwSetWindowShouldClose(glWindow, true);
+    }
+
+    public void render() {
+        currentScreen.render();
+    }
+
+    public void cursorMoved(double cursorXCoord, double cursorYCoord) {
+        currentScreen.cursorMoved(cursorXCoord, cursorYCoord);
     }
 
     public void buttonPressed(double cursorXCoord, double cursorYCoord) {
-        if (currentScreen == ScreenOption.MAIN_MENU) {
-            setupGame.setBackgroundPosition(mainMenu.getBackgroundPosition());
-            setupGame.setLastTime(mainMenu.getLastTime());
-            currentScreen = mainMenu.buttonPressed(cursorXCoord, cursorYCoord);
-        }
-        else if (currentScreen == ScreenOption.SETUP_GAME) {
-            mainMenu.setBackgroundPosition(setupGame.getBackgroundPosition());
-            mainMenu.setLastTime(setupGame.getLastTime());
-            currentScreen = setupGame.buttonPressed(cursorXCoord, cursorYCoord);
-        }
+        currentScreen.buttonPressed(this, cursorXCoord, cursorYCoord);
     }
 }
