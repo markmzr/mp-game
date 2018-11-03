@@ -38,9 +38,9 @@ public class Main {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        int resolutionWidth = vidmode.width();
-        int resolutionHeight = vidmode.height();
+        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        int resolutionWidth = vidMode.width();
+        int resolutionHeight = vidMode.height();
 
         window = glfwCreateWindow(
                 (int) (resolutionWidth * 0.6),

@@ -1,34 +1,24 @@
 public class GLButton extends GL2DObject {
 
-    private Texture highlightTexture;
-    private double[] topLeftXY;
-    private double[] topRightXY;
-    private double[] bottomLeftXY;
-    private double[] bottomRightXY;
+    private double leftXCoord;
+    private double rightXCoord;
+    private double topYCoord;
+    private double bottomYCoord;
     private boolean highlighted;
+    private boolean enabled;
 
-    public GLButton(float[] vertices, String textureFilename, String highlightTexture,
-                    double x1Coord, double x2Coord, double y1Coord, double y2Coord) {
-        super(vertices, textureFilename);
+    public GLButton(float[] vertices, String[] textureFilenames,
+                    double leftXCoord, double rightXCoord,
+                    double topYCoord, double bottomYCoord) {
+        super(vertices, textureFilenames);
 
-        topLeftXY = new double[2];
-        topLeftXY[0] = x1Coord;
-        topLeftXY[1] = y1Coord;
-
-        topRightXY = new double[2];
-        topRightXY[0] = x2Coord;
-        topRightXY[1] = y1Coord;
-
-        bottomLeftXY = new double[2];
-        bottomLeftXY[0] = x1Coord;
-        bottomLeftXY[1] = y2Coord;
-
-        bottomRightXY = new double[2];
-        bottomRightXY[0] = x2Coord;
-        bottomRightXY[1] = y2Coord;
+        this.leftXCoord = leftXCoord;
+        this.rightXCoord = rightXCoord;
+        this.topYCoord = topYCoord;
+        this.bottomYCoord = bottomYCoord;
 
         highlighted = false;
-        this.highlightTexture = new Texture(highlightTexture);
+        enabled = true;
     }
 
     public void setHighlighted(boolean highlighted) {
@@ -39,11 +29,17 @@ public class GLButton extends GL2DObject {
         return highlighted;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean getEnabled() {
+        return enabled;
+    }
+
     public boolean isCursorInRange(double cursorXPos, double cursorYPos) {
-        if ((cursorXPos >= topLeftXY[0] && cursorYPos >= topLeftXY[1])
-                && (cursorXPos <= topRightXY[0] && cursorYPos >= topRightXY[1])
-                && (cursorXPos >= bottomLeftXY[0] && cursorYPos <= bottomLeftXY[1])
-                && (cursorXPos <= bottomRightXY[0] && cursorYPos <= bottomRightXY[1])) {
+        if (cursorXPos >= leftXCoord && cursorXPos <= rightXCoord
+                && cursorYPos >= topYCoord && cursorYPos <= bottomYCoord) {
             return true;
         }
 
@@ -55,10 +51,13 @@ public class GLButton extends GL2DObject {
         shader.setTransform(position);
 
         if (highlighted) {
-            highlightTexture.bind();
+            texture[1].bind();
+        }
+        else if (enabled) {
+            texture[0].bind();
         }
         else {
-            texture.bind();
+            texture[2].bind();
         }
 
         model.render();

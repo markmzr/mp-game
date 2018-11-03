@@ -35,7 +35,8 @@ public class SetupScreen implements Screen {
                 -0.9f, -0.82f, 0f,
                 -0.9f, -0.70f, 0f,
         };
-        mainMenu = new GLButton(mainMenuVertices, "Main Menu.png", "Main Menu Highlighted.png", 0.05, 0.25, 0.85, 0.91);
+        String[] mainMenuTextures = { "Main Menu.png", "Main Menu Highlighted.png" };
+        mainMenu = new GLButton(mainMenuVertices, mainMenuTextures, 0.05, 0.25, 0.85, 0.91);
 
         float[] startGameVertices = new float[] {
                 0.5f, -0.70f, 0f,
@@ -46,7 +47,8 @@ public class SetupScreen implements Screen {
                 0.5f, -0.82f, 0f,
                 0.5f, -0.70f, 0f,
         };
-        startGame = new GLButton(startGameVertices, "Start Game.png", "Start Game Highlighted.png", 0.7, 0.95, 0.85, 0.91);
+        String[] startGameTextures = { "Start Game.png", "Start Game Highlighted.png" };
+        startGame = new GLButton(startGameVertices, startGameTextures, 0.7, 0.95, 0.85, 0.91);
 
         lastTime = 0;
         moveRightMaxTime = 60;
