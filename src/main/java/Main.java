@@ -16,7 +16,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Main {
 
     private long window;
-    private GameState gameState;
+    private ScreenState screenState;
 
     public void run() {
         init();
@@ -90,12 +90,12 @@ public class Main {
 
     private void loop() {
         GL.createCapabilities();
-        gameState = new GameState(window);
+        screenState = new ScreenState(window);
 
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            gameState.render();
+            screenState.render();
 
             glfwSwapBuffers(window);
             glfwPollEvents();
@@ -124,7 +124,7 @@ public class Main {
 
             double cursorXCoord = cursorXPos / windowWidth[0];
             double cursorYCoord = cursorYPos / windowHeight[0];
-            gameState.cursorMoved(cursorXCoord, cursorYCoord);
+            screenState.cursorMoved(cursorXCoord, cursorYCoord);
         }
     };
 
@@ -145,7 +145,7 @@ public class Main {
             double cursorYCoord = cursorYPos[0] / windowHeight[0];
 
             if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
-                gameState.buttonPressed(cursorXCoord, cursorYCoord);
+                screenState.buttonPressed(cursorXCoord, cursorYCoord);
             }
         }
     };

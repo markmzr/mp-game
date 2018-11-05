@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public class GameScreen implements Screen {
 
     private GL2DObject boardBackground;
@@ -8,9 +6,7 @@ public class GameScreen implements Screen {
     private GLButton rollDice;
     private GLButton endTurn;
     private GLButton quit;
-    private Player player;
-    private int firstDieVal;
-    private int secondDieVal;
+    private GameState gameState;
 
     public GameScreen() {
         float[] backgroundVertices = new float[] {
@@ -94,19 +90,19 @@ public class GameScreen implements Screen {
                 "Quit Game Screen Highlighted.png"};
         quit = new GLButton(quitVertices, quitTextures, 0.86055, 0.98008, 0.90486, 0.96458);
 
-        player = new Player();
+        gameState = new GameState();
     }
 
     public void render() {
         boardBackground.render();
-        firstDie.render(firstDieVal);
-        secondDie.render(secondDieVal);
+        firstDie.render(gameState.getFirstDieVal());
+        secondDie.render(gameState.getSecondDieVal());
 
         rollDice.render();
         endTurn.render();
         quit.render();
 
-        player.render();
+        gameState.render(this);
     }
 
     public void cursorMoved(double cursorXCoord, double cursorYCoord) {
@@ -132,37 +128,31 @@ public class GameScreen implements Screen {
         }
     }
 
-    public void buttonPressed(GameState gameState, double cursorXCoord, double cursorYCoord) {
+    public void buttonPressed(ScreenState screenState, double cursorXCoord, double cursorYCoord) {
         if (rollDice.getEnabled() && rollDice.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            rollDice();
+            gameState.rollDice();
+            rollDice.setHighlighted(false);
+            rollDice.setEnabled(false);
         }
 
         if (endTurn.getEnabled() && endTurn.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            endTurn();
+            gameState.setAiTurn();
+            endTurn.setHighlighted(false);
+            endTurn.setEnabled(false);
         }
 
         if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            quit.setHighlighted(false);
-            gameState.quitGame();
+            screenState.quitGame();
         }
     }
 
-    public void rollDice() {
-        Random rand = new Random();
-        firstDieVal = rand.nextInt(6);
-        secondDieVal = rand.nextInt(6);
-
-        int diceRoll = firstDieVal + secondDieVal + 2;
-        player.updatePosition(diceRoll);
-
+    public void enableRollDice() {
         rollDice.setHighlighted(false);
-        rollDice.setEnabled(false);
-        endTurn.setEnabled(true);
+        rollDice.setEnabled(true);
     }
 
-    public void endTurn() {
+    public void enableEndTurn() {
         endTurn.setHighlighted(false);
-        endTurn.setEnabled(false);
-        rollDice.setEnabled(true);
+        endTurn.setEnabled(true);
     }
 }

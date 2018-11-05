@@ -5,12 +5,15 @@ import static org.lwjgl.glfw.GLFW.glfwGetTime;
 public class Player {
 
     private GL2DObject token;
+    private String name;
+    private int id;
+    private int money;
     private int currentPosition;
     private int newPosition;
     private double deltaTime;
     private double lastTime;
 
-    public Player() {
+    public Player(String name, int id, String tokenTexture) {
         float[] tokenVertices = new float[] {
                 0.01641f, -0.82361f, 0,
                 0.06641f, -0.82361f, 0,
@@ -20,11 +23,34 @@ public class Player {
                 0.01641f, -0.88195f, 0,
                 0.01641f, -0.82361f, 0,
         };
-        token = new GL2DObject(tokenVertices, "Hat.png");
+        token = new GL2DObject(tokenVertices, tokenTexture);
 
+        this.name = name;
+        this.id = id;
+        money = 1500;
         currentPosition = 0;
         newPosition = 0;
         lastTime = 0;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public int getNewPosition() {
+        return newPosition;
     }
 
     public void render() {
@@ -42,6 +68,10 @@ public class Player {
         }
 
         token.render();
+    }
+
+    public void updateMoney(int amount) {
+        money += amount;
     }
 
     public void updatePosition(int diceRoll) {

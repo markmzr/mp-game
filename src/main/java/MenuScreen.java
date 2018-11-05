@@ -134,15 +134,14 @@ public class MenuScreen implements Screen {
         }
     }
 
-    public void buttonPressed(GameState gameState, double cursorXCoord, double cursorYCoord) {
+    public void buttonPressed(ScreenState screenState, double cursorXCoord, double cursorYCoord) {
         if (newGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
             newGame.setHighlighted(false);
-            gameState.setToSetupScreen();
+            screenState.setToSetupScreen();
         }
 
         if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            quit.setHighlighted(false);
-            gameState.quitGame();
+            screenState.quitGame();
         }
     }
 }

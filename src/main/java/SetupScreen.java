@@ -77,27 +77,19 @@ public class SetupScreen implements Screen {
         double currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
         lastTime = currentTime;
-
-        Vector3f moveLeft = new Vector3f(-0.09469f, 0, 0);
-        Vector3f moveRight = new Vector3f(0.09469f, 0, 0);
-        Vector3f moveUp = new Vector3f(0, 0.19469f, 0);
-        Vector3f moveDown = new Vector3f(0, -0.19469f, 0);
+        Vector3f moveDirection = new Vector3f(0, 0, 0);
 
         if (currentTime < moveRightMaxTime) {
-            moveRight.mul((float)deltaTime);
-            background.movePosition(moveRight);
+            moveDirection.x = 0.09469f;
         }
-        else if (currentTime >= moveRightMaxTime && currentTime < moveDownMaxTime) {
-            moveDown.mul((float)deltaTime);
-            background.movePosition(moveDown);
+        else if (currentTime < moveDownMaxTime) {
+            moveDirection.y = -0.19469f;
         }
-        else if (currentTime >= moveDownMaxTime && currentTime < moveLeftMaxTime) {
-            moveLeft.mul((float)deltaTime);
-            background.movePosition(moveLeft);
+        else if (currentTime < moveLeftMaxTime) {
+            moveDirection.x = -0.09469f;
         }
-        else if (currentTime >= moveLeftMaxTime && currentTime < moveUpMaxTime) {
-            moveUp.mul((float)deltaTime);
-            background.movePosition(moveUp);
+        else if (currentTime < moveUpMaxTime) {
+            moveDirection.y = 0.19469f;
         }
         else {
             moveRightMaxTime += 240;
@@ -106,6 +98,8 @@ public class SetupScreen implements Screen {
             moveUpMaxTime += 240;
         }
 
+        moveDirection.mul((float)deltaTime);
+        background.movePosition(moveDirection);
         background.render();
         mainMenu.render();
         startGame.render();
@@ -127,15 +121,15 @@ public class SetupScreen implements Screen {
         }
     }
 
-    public void buttonPressed(GameState gameState, double cursorXCoord, double cursorYCoord) {
+    public void buttonPressed(ScreenState screenState, double cursorXCoord, double cursorYCoord) {
         if (mainMenu.isCursorInRange(cursorXCoord, cursorYCoord)) {
             mainMenu.setHighlighted(false);
-            gameState.setToMenuScreen();
+            screenState.setToMenuScreen();
         }
 
         if (startGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
             startGame.setHighlighted(false);
-            gameState.setToGameScreen();
+            screenState.setToGameScreen();
         }
     }
 }
