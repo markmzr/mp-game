@@ -16,51 +16,14 @@ public class MenuScreen implements Screen {
     private double moveDownMaxTime;
 
     public MenuScreen() {
-        float[] backgroundVertices = new float[] {
-                -6.68f, 12.68f, 0f,
-                1.0f, 12.68f, 0f,
-                1.0f, -1.0f, 0f,
+        background = new GL2DObject("Background Large.png", -7271, -8392, 9831, 9831);
+        logo = new GL2DObject("Logo.png", 256, 100, 2048, 288);
 
-                1.0f, -1.0f, 0f,
-                -6.68f, -1.0f, 0f,
-                -6.68f, 12.68f, 0f,
-        };
-        background = new GL2DObject(backgroundVertices, "Background.png");
+        String[] newGameTextures = { "Buttons/New Game.png", "Buttons/New Game Highlighted.png" };
+        newGame = new GLButton(newGameTextures, 1024, 677, 512, 86);
 
-        float[] logoVertices = new float[] {
-                -0.8f, 0.86f, 0f,
-                0.8f, 0.86f, 0f,
-                0.8f, 0.46f, 0f,
-
-                0.8f, 0.46f, 0f,
-                -0.8f, 0.46f, 0f,
-                -0.8f, 0.86f, 0f,
-        };
-        logo = new GL2DObject(logoVertices, "Logo.png");
-
-        float[] newGameVertices = new float[] {
-                -0.2f, 0.06f, 0f,
-                0.2f, 0.06f, 0f,
-                0.2f, -0.06f, 0f,
-
-                0.2f, -0.06f, 0f,
-                -0.2f, -0.06f, 0f,
-                -0.2f, 0.06f, 0f,
-        };
-        String[] newGameTextures = { "New Game.png", "New Game Highlighted.png" };
-        newGame = new GLButton(newGameVertices, newGameTextures, 0.4, 0.6, 0.47, 0.53);
-
-        float[] quitVertices = new float[] {
-                -0.2f, -0.18f, 0f,
-                0.2f, -0.18f, 0f,
-                0.2f, -0.30f, 0f,
-
-                0.2f, -0.30f, 0f,
-                -0.2f, -0.30f, 0f,
-                -0.2f, -0.18f, 0f,
-        };
-        String[] quitTextures = { "Quit.png", "Quit Highlighted.png" };
-        quit = new GLButton(quitVertices, quitTextures, 0.4, 0.6, 0.59, 0.65);
+        String[] quitTextures = { "Buttons/Quit Large.png", "Buttons/Quit Large Highlighted.png" };
+        quit = new GLButton(quitTextures, 1024, 852, 512, 86);
 
         lastTime = 0;
         moveRightMaxTime = 60;

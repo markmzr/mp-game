@@ -8,7 +8,7 @@ public class Property implements BoardLocation {
     private int rent;
     private boolean improvable;
     private boolean owned;
-    private int ownerId;
+    private Player owner;
 
     public Property(String name, int location, int cost, int rent, boolean improvable) {
         this.name = name;
@@ -17,10 +17,11 @@ public class Property implements BoardLocation {
         this.rent = rent;
         this.improvable = improvable;
         owned = false;
-        ownerId = 0;
+        owner = null;
     }
 
-    public void playerLanded(GameState gameState, Board board, Player player) {
+    public void playerLanded(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
         System.out.println(player.getName() + " landed on " + name + ".");
 
         if (!owned) {
@@ -31,38 +32,38 @@ public class Property implements BoardLocation {
                     String input = scanner.nextLine();
 
                     if (input.equals("y") || input.equals("Y")) {
-                        owned = true;
-                        ownerId = player.getId();
-                        player.updateMoney(-1 * cost);
-                        System.out.println(player.getName() + " bought " + name + ", $" + player.getMoney() + " remaining.");
+                        buyProperty(player);
                     }
                     else {
                         System.out.println(player.getName() + " did not buy " + name + ".");
                     }
                 }
                 else {
-                    owned = true;
-                    ownerId = player.getId();
-                    player.updateMoney(-1 * cost);
-                    System.out.println(player.getName() + " bought " + name + ", $" + player.getMoney() + " remaining.");
+                    buyProperty(player);
                 }
             }
             else {
                 System.out.println(player.getName() + " cannot afford " + name + ". $" + cost + ", $" + player.getMoney());
             }
         }
-        else if (ownerId == player.getId()) {
+        else if (player == owner) {
             System.out.println(player.getName() + " owns " + name + ".");
         }
         else {
             player.updateMoney(-1 * rent);
-            Player owner = gameState.getPlayer(ownerId);
             owner.updateMoney(rent);
-
             System.out.println(owner.getName() + " owns " + name + ". "
                     + player.getName() + " paid " + owner.getName() + " $" + rent + " for rent.");
         }
 
         gameState.setTurnCompleted(true);
+    }
+
+    public void buyProperty(Player player) {
+        owned = true;
+        owner = player;
+        player.updateMoney(-1 * cost);
+        player.addOwnerIcon(location);
+        System.out.println(player.getName() + " bought " + name + ".");
     }
 }

@@ -9,88 +9,38 @@ public class GameScreen implements Screen {
     private GameState gameState;
 
     public GameScreen() {
-        float[] backgroundVertices = new float[] {
-                -1f, 1f, 0f,
-                1f, 1f, 0f,
-                1f, -1f, 0f,
-
-                1f, -1f, 0f,
-                -1f, -1f, 0f,
-                -1f, 1f, 0f,
-        };
-        boardBackground = new GL2DObject(backgroundVertices, "Game Screen Background.png");
-
-        float[] firstDieVertices = new float[] {
-                -0.4859375f, 0.03611111f, 0f,
-                -0.44609375f, 0.03611111f, 0f,
-                -0.44609375f, -0.03472222f, 0f,
-
-                -0.44609375f, -0.03472222f, 0f,
-                -0.4859375f, -0.03472222f, 0f,
-                -0.4859375f, 0.03611111f, 0f,
-        };
+        boardBackground = new GL2DObject("Background.png", 0, 0, 2560, 1440);
 
         String[] dieTextures = new String[6];
         for (int i = 0; i < 6; i++) {
-            dieTextures[i] = "Dice" + (i + 1) + ".png";
+            dieTextures[i] = "Dice/Dice" + (i + 1) + ".png";
         }
+        firstDie = new GL2DObject(dieTextures, 658, 694, 51, 51);
+        secondDie = new GL2DObject(dieTextures, 730, 694, 51, 51);
 
-        firstDie = new GL2DObject(firstDieVertices, dieTextures);
+        String[] rollDiceTextures = {"Buttons/Roll Dice.png",
+                "Buttons/Roll Dice Highlighted.png", "Buttons/Roll Dice Disabled.png" };
+        rollDice = new GLButton(rollDiceTextures, 1491, 1303, 305, 86);
 
-        float[] secondDieVertices = new float[] {
-                -0.4296875f, 0.03611111f, 0f,
-                -0.38984375f, 0.03611111f, 0f,
-                -0.38984375f, -0.03472222f, 0f,
-
-                -0.38984375f, -0.03472222f, 0f,
-                -0.4296875f, -0.03472222f, 0f,
-                -0.4296875f, 0.03611111f, 0f,
-        };
-        secondDie = new GL2DObject(secondDieVertices, dieTextures);
-
-        float[] rollDiceVertices = new float[] {
-                0.16484f, -0.80972f, 0f,
-                0.40313f, -0.80972f, 0f,
-                0.40313f, -0.92916f, 0f,
-
-                0.40313f, -0.92916f, 0f,
-                0.16484f, -0.92916f, 0f,
-                0.16484f, -0.80972f, 0f,
-        };
-        String[] rollDiceTextures = {"Roll Dice.png", "Roll Dice Highlighted.png",
-                "Roll Dice Disabled.png" };
-        rollDice = new GLButton(rollDiceVertices, rollDiceTextures,
-                0.58242, 0.70156, 0.90486, 0.96458);
-
-        float[] endTurnVertices = new float[] {
-                0.44297f, -0.80972f, 0f,
-                0.68125f, -0.80972f, 0f,
-                0.68125f, -0.92916f, 0f,
-
-                0.68125f, -0.92916f, 0f,
-                0.44297f, -0.92916f, 0f,
-                0.44297f, -0.80972f, 0f,
-        };
-        String[] endTurnTextures = { "End Turn.png", "End Turn Highlighted.png",
-                "End Turn Disabled.png" };
-        endTurn = new GLButton(endTurnVertices, endTurnTextures,
-                0.72109, 0.84063, 0.90486, 0.96458);
+        String[] endTurnTextures = { "Buttons/End Turn.png",
+                "Buttons/End Turn Highlighted.png", "Buttons/End Turn Disabled.png"};
+        endTurn = new GLButton(endTurnTextures, 1847, 1303, 305, 86);
         endTurn.setEnabled(false);
 
-        float[] quitVertices = new float[] {
-                0.72109f, -0.80972f, 0f,
-                0.96016f, -0.80972f, 0f,
-                0.96016f, -0.92916f, 0f,
+        String[] quitTextures = {"Buttons/Quit.png", "Buttons/Quit Highlighted.png"};
+        quit = new GLButton(quitTextures, 2203, 1303, 305, 86);
 
-                0.96016f, -0.92916f, 0f,
-                0.72109f, -0.92916f, 0f,
-                0.72109f, -0.80972f, 0f,
-        };
-        String[] quitTextures = {"Quit Game Screen.png",
-                "Quit Game Screen Highlighted.png"};
-        quit = new GLButton(quitVertices, quitTextures, 0.86055, 0.98008, 0.90486, 0.96458);
+        gameState = new GameState(this);
+    }
 
-        gameState = new GameState();
+    public void enableRollDice() {
+        rollDice.setHighlighted(false);
+        rollDice.setEnabled(true);
+    }
+
+    public void enableEndTurn() {
+        endTurn.setHighlighted(false);
+        endTurn.setEnabled(true);
     }
 
     public void render() {
@@ -102,7 +52,7 @@ public class GameScreen implements Screen {
         endTurn.render();
         quit.render();
 
-        gameState.render(this);
+        gameState.render();
     }
 
     public void cursorMoved(double cursorXCoord, double cursorYCoord) {
@@ -136,7 +86,7 @@ public class GameScreen implements Screen {
         }
 
         if (endTurn.getEnabled() && endTurn.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            gameState.setAiTurn();
+            gameState.setNextTurn();
             endTurn.setHighlighted(false);
             endTurn.setEnabled(false);
         }
@@ -144,15 +94,5 @@ public class GameScreen implements Screen {
         if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
             screenState.quitGame();
         }
-    }
-
-    public void enableRollDice() {
-        rollDice.setHighlighted(false);
-        rollDice.setEnabled(true);
-    }
-
-    public void enableEndTurn() {
-        endTurn.setHighlighted(false);
-        endTurn.setEnabled(true);
     }
 }

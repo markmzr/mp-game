@@ -7,26 +7,15 @@ public class GLButton extends GL2DObject {
     private boolean highlighted;
     private boolean enabled;
 
-    public GLButton(float[] vertices, String[] textureFilenames,
-                    double leftXCoord, double rightXCoord,
-                    double topYCoord, double bottomYCoord) {
-        super(vertices, textureFilenames);
-
-        this.leftXCoord = leftXCoord;
-        this.rightXCoord = rightXCoord;
-        this.topYCoord = topYCoord;
-        this.bottomYCoord = bottomYCoord;
-
+    public GLButton(String[] textureFilenames, int leftX, int topY, int width, int height) {
+        super(textureFilenames, leftX, topY, width, height);
+        createCoords(leftX, topY, width, height);
         highlighted = false;
         enabled = true;
     }
 
     public void setHighlighted(boolean highlighted) {
         this.highlighted = highlighted;
-    }
-
-    public boolean getHighlighted() {
-        return highlighted;
     }
 
     public void setEnabled(boolean enabled) {
@@ -37,13 +26,14 @@ public class GLButton extends GL2DObject {
         return enabled;
     }
 
-    public boolean isCursorInRange(double cursorXPos, double cursorYPos) {
-        if (cursorXPos >= leftXCoord && cursorXPos <= rightXCoord
-                && cursorYPos >= topYCoord && cursorYPos <= bottomYCoord) {
-            return true;
-        }
+    public void createCoords(int leftX, int topY, int width, int height) {
+        int resolutionWidth = 2560;
+        int resolutionHeight = 1440;
 
-        return false;
+        leftXCoord = (float)leftX / resolutionWidth;
+        rightXCoord = (float)(leftX + width) / resolutionWidth;
+        topYCoord = (float)topY / resolutionHeight;
+        bottomYCoord = (float)(topY + height) / resolutionHeight;
     }
 
     public void render() {
@@ -61,5 +51,14 @@ public class GLButton extends GL2DObject {
         }
 
         model.render();
+    }
+
+    public boolean isCursorInRange(double cursorXPos, double cursorYPos) {
+        if (cursorXPos >= leftXCoord && cursorXPos <= rightXCoord
+                && cursorYPos >= topYCoord && cursorYPos <= bottomYCoord) {
+            return true;
+        }
+
+        return false;
     }
 }

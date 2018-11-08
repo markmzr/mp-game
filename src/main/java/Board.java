@@ -4,7 +4,6 @@ public class Board {
 
     public Board() {
         boardLocations = new BoardLocation[40];
-
         BoardLocation go = this::go;
         BoardLocation communityChest = this::communityChest;
         BoardLocation chance = this::chance;
@@ -55,44 +54,52 @@ public class Board {
         boardLocations[39] = new Property("39 Ave", 39, 100, 100, true);
     }
 
-    public void playerLanded(GameState gameState, Player player) {
-        boardLocations[player.getCurrentPosition()].playerLanded(gameState, this, player);
+    public void playerLanded(GameState gameState) {
+        boardLocations[gameState.getCurrentPlayer().getCurrentPosition()].playerLanded(gameState);
     }
 
-    public void go(GameState gameState, Board board, Player player) {
+    public void go(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
+
         System.out.println(player.getName() + " landed on Go.");
         player.updateMoney(400);
         System.out.println(player.getName() + " received $400 for landing on Go.");
         gameState.setTurnCompleted(true);
     }
 
-    public void communityChest(GameState gameState, Board board, Player player) {
+    public void communityChest(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
         System.out.println(player.getName() + " landed on Community Chest.");
         gameState.setTurnCompleted(true);
     }
 
-    public void chance(GameState gameState, Board board, Player player) {
+    public void chance(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
         System.out.println(player.getName() + " landed on Chance.");
         gameState.setTurnCompleted(true);
     }
 
-    public void tax(GameState gameState, Board board, Player player) {
+    public void tax(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
         System.out.println(player.getName() + " landed on Tax.");
         player.updateMoney(-100);
         gameState.setTurnCompleted(true);
     }
 
-    public void visitingJail(GameState gameState, Board board, Player player) {
+    public void visitingJail(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
         System.out.println(player.getName() + " landed on Visiting Jail.");
         gameState.setTurnCompleted(true);
     }
 
-    public void freeParking(GameState gameState, Board board, Player player) {
+    public void freeParking(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
         System.out.println(player.getName() + " landed on Free Parking.");
         gameState.setTurnCompleted(true);
     }
 
-    public void goToJail(GameState gameState, Board board, Player player) {
+    public void goToJail(GameState gameState) {
+        Player player = gameState.getCurrentPlayer();
         System.out.println(player.getName() + " landed on Go to Jail.");
         gameState.setTurnCompleted(true);
     }

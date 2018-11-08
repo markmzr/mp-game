@@ -15,40 +15,15 @@ public class SetupScreen implements Screen {
     private double moveDownMaxTime;
 
     public SetupScreen() {
-        float[] backgroundVertices = new float[] {
-                -6.68f, 12.68f, 0f,
-                1.0f, 12.68f, 0f,
-                1.0f, -1.0f, 0f,
+        background = new GL2DObject("Background Large.png", -7271, -8392, 9831, 9831);
 
-                1.0f, -1.0f, 0f,
-                -6.68f, -1.0f, 0f,
-                -6.68f, 12.68f, 0f,
-        };
-        background = new GL2DObject(backgroundVertices, "Background.png");
+        String[] mainMenuTextures = { "Buttons/Main Menu.png",
+                "Buttons/Main Menu Highlighted.png" };
+        mainMenu = new GLButton(mainMenuTextures, 128, 1224, 512, 86);
 
-        float[] mainMenuVertices = new float[] {
-                -0.9f, -0.70f, 0f,
-                -0.5f, -0.70f, 0f,
-                -0.5f, -0.82f, 0f,
-
-                -0.5f, -0.82f, 0f,
-                -0.9f, -0.82f, 0f,
-                -0.9f, -0.70f, 0f,
-        };
-        String[] mainMenuTextures = { "Main Menu.png", "Main Menu Highlighted.png" };
-        mainMenu = new GLButton(mainMenuVertices, mainMenuTextures, 0.05, 0.25, 0.85, 0.91);
-
-        float[] startGameVertices = new float[] {
-                0.5f, -0.70f, 0f,
-                0.9f, -0.70f, 0f,
-                0.9f, -0.82f, 0f,
-
-                0.9f, -0.82f, 0f,
-                0.5f, -0.82f, 0f,
-                0.5f, -0.70f, 0f,
-        };
-        String[] startGameTextures = { "Start Game.png", "Start Game Highlighted.png" };
-        startGame = new GLButton(startGameVertices, startGameTextures, 0.7, 0.95, 0.85, 0.91);
+        String[] startGameTextures = { "Buttons/Start Game.png",
+                "Buttons/Start Game Highlighted.png" };
+        startGame = new GLButton(startGameTextures, 1920, 1224, 512, 86);
 
         lastTime = 0;
         moveRightMaxTime = 60;
