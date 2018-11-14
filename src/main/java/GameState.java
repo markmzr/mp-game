@@ -1,5 +1,3 @@
-import org.joml.Vector3f;
-
 import java.util.Random;
 
 public class GameState {
@@ -8,73 +6,66 @@ public class GameState {
     private Board board;
     private Player[] players;
     private Player currentPlayer;
-    private GL2DObject playerHighlight;
-    private int firstDieVal;
-    private int secondDieVal;
+    private int die1Val;
+    private int die2Val;
     private int playerTurn;
-    private boolean turnCompleted;
+    private int eventCard;
 
     public GameState(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
-        board = new Board();
+        board = new Board(this);
 
         players = new Player[4];
-        players[0] = new Player("Player", 0, "Tokens/Hat.png");
-        players[1] = new Player("AI 1", 1, "Tokens/AI 1 Token.png");
-        players[2] = new Player("AI 2", 2, "Tokens/AI 2 Token.png");
-        players[3] = new Player("AI 3", 3, "Tokens/AI 3 Token.png");
+        players[0] = new Player(board, "Player", 0, "Tokens/Hat.png");
+        players[1] = new Player(board, "AI 1", 1, "Tokens/AI 1 Token.png");
+        players[2] = new Player(board, "AI 2", 2, "Tokens/AI 2 Token.png");
+        players[3] = new Player(board, "AI 3", 3, "Tokens/AI 3 Token.png");
         currentPlayer = players[0];
 
-        playerHighlight = new GL2DObject("Player Highlight.png", 1481, 41, 1038, 134);
-        firstDieVal = 0;
-        secondDieVal = 0;
+        die1Val = 0;
+        die2Val = 0;
         playerTurn = 0;
-        turnCompleted = false;
+    }
+
+    public GameScreen getGameScreen() {
+        return gameScreen;
+    }
+
+    public void setEventCard(int eventCard) {
+        this.eventCard = eventCard;
     }
 
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
 
-    public int getFirstDieVal() {
-        return firstDieVal;
+    public Player[] getPlayers() {
+        return players;
     }
 
-    public int getSecondDieVal() {
-        return secondDieVal;
+    public int getDie1Val() {
+        return die1Val;
     }
 
-    public void setTurnCompleted(boolean turnCompleted) {
-        this.turnCompleted = turnCompleted;
+    public int getDie2Val() {
+        return die2Val;
+    }
 
-        if (turnCompleted) {
-            if (playerTurn == 0) {
-                gameScreen.enableEndTurn();
-            }
-            else {
-                setNextTurn();
-            }
-        }
+    public int getEventCard() {
+        return eventCard;
     }
 
     public void render() {
-        if (currentPlayer.getTokenMoving()
-                && currentPlayer.getCurrentPosition() == currentPlayer.getNewPosition()) {
-            board.playerLanded(this);
-            currentPlayer.setTokenMoving(false);
-        }
-
         for (Player player : players) {
             player.render();
         }
-        playerHighlight.render();
     }
 
     public void rollDice() {
         Random random = new Random();
-        firstDieVal = random.nextInt(6);
-        secondDieVal = random.nextInt(6);
-        int diceRoll = firstDieVal + secondDieVal + 2;
+        die1Val = random.nextInt(6);
+        die2Val = random.nextInt(6);
+        int diceRoll = die1Val + die2Val + 2;
 
         currentPlayer.updatePosition(diceRoll);
         currentPlayer.updateMoneyDifference("+$0");
@@ -84,16 +75,45 @@ public class GameState {
         if (playerTurn < players.length - 1) {
             playerTurn++;
             currentPlayer = players[playerTurn];
-            playerHighlight.movePosition(new Vector3f(0f, -0.22916f, 0f));
+            gameScreen.setPlayerHighlight(playerTurn);
+
+            if (currentPlayer.getInJail()) {
+                payFine();
+            }
             rollDice();
-        }
-        else {
+        } else {
             playerTurn = 0;
             currentPlayer = players[0];
-            playerHighlight.movePosition(new Vector3f(0f, 0.6875f, 0f));
+            gameScreen.setPlayerHighlight(playerTurn);
+
+            if (players[0].getInJail()) {
+                gameScreen.setPromptState(PromptState.JAIL);
+            } else {
+                gameScreen.enableRollDice();
+            }
+        }
+    }
+
+    public void turnCompleted() {
+        if (playerTurn == 0) {
+            gameScreen.enableEndTurn();
+        } else {
+            setNextTurn();
+        }
+    }
+
+    public void buyProperty(boolean response) {
+        if (response) {
+            board.buyProperty(currentPlayer);
+        }
+        turnCompleted();
+    }
+
+    public void payFine() {
+        currentPlayer.updateMoney(-50);
+        currentPlayer.setInJail(false);
+        if (playerTurn == 0) {
             gameScreen.enableRollDice();
         }
-
-        turnCompleted = false;
     }
 }

@@ -1,4 +1,4 @@
 public interface BoardLocation {
 
-    void playerLanded(GameState gameState);
+    void playerLanded();
 }

@@ -26,7 +26,6 @@ public class GL2DObject {
         for (int i = 0; i < textureFilenames.length; i++) {
             texture[i] = new Texture(textureFilenames[i]);
         }
-
         position = new Matrix4f().ortho2D(-1, 1, -1, 1);
     }
 
@@ -42,7 +41,7 @@ public class GL2DObject {
         position.translate(direction);
     }
 
-    public float[] createVertices(int leftX, int topY, int width, int height) {
+    private float[] createVertices(int leftX, int topY, int width, int height) {
         int halfResWidth = 1280;
         int halfResHeight = 720;
 
@@ -60,7 +59,6 @@ public class GL2DObject {
                 leftXf, bottomYf, 0f,
                 leftXf, topYf, 0f,
         };
-
         return vertices;
     }
 
@@ -71,10 +69,10 @@ public class GL2DObject {
         model.render();
     }
 
-    public void render(int textureValue) {
+    public void render(int textureVal) {
         shader.use();
         shader.setTransform(position);
-        texture[textureValue].bind();
+        texture[textureVal].bind();
         model.render();
     }
 }

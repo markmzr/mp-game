@@ -5,7 +5,7 @@ public class GLText extends GL2DObject {
     private GL2DObject[] characters;
     private String text;
 
-    public GLText(String text, int leftPixelX, int topPixelY, int pixelWidth, int pixelHeight) {
+    public GLText(String text, int leftX, int topY, int width, int height) {
         characters = new GL2DObject[6];
 
         String[] textures = new String[13];
@@ -17,11 +17,10 @@ public class GLText extends GL2DObject {
         textures[12] = "Text/-.png";
 
         for (int i = 0; i < 6; i++) {
-            characters[i] = new GL2DObject(textures, leftPixelX, topPixelY, pixelWidth, pixelHeight);
+            characters[i] = new GL2DObject(textures, leftX, topY, width, height);
             Vector3f direction = new Vector3f(0.035f * i, 0f, 0f);
             characters[i].movePosition(direction);
         }
-
         this.text = text;
     }
 
@@ -37,21 +36,17 @@ public class GLText extends GL2DObject {
 
     public void render() {
         for (int i = 0; i < text.length(); i++) {
-            int textureValue;
+            int textureVal;
             if (text.charAt(i) == '$') {
-                textureValue = 10;
+                textureVal = 10;
+            } else if (text.charAt(i) == '+') {
+                textureVal = 11;
+            } else if (text.charAt(i) == '-') {
+                textureVal = 12;
+            } else {
+                textureVal = text.charAt(i) - 48;
             }
-            else if (text.charAt(i) == '+') {
-                textureValue = 11;
-            }
-            else if (text.charAt(i) == '-') {
-                textureValue = 12;
-            }
-            else {
-                textureValue = text.charAt(i) - 48;
-            }
-
-            characters[i].render(textureValue);
+            characters[i].render(textureVal);
         }
     }
 }

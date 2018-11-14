@@ -56,17 +56,13 @@ public class MenuScreen implements Screen {
 
         if (currentTime < moveRightMaxTime) {
             moveDirection.x = 0.09469f;
-        }
-        else if (currentTime < moveDownMaxTime) {
+        } else if (currentTime < moveDownMaxTime) {
             moveDirection.y = -0.19469f;
-        }
-        else if (currentTime < moveLeftMaxTime) {
+        } else if (currentTime < moveLeftMaxTime) {
             moveDirection.x = -0.09469f;
-        }
-        else if (currentTime < moveUpMaxTime) {
+        } else if (currentTime < moveUpMaxTime) {
             moveDirection.y = 0.19469f;
-        }
-        else {
+        } else {
             moveRightMaxTime += 240;
             moveDownMaxTime += 240;
             moveLeftMaxTime += 240;
@@ -82,19 +78,8 @@ public class MenuScreen implements Screen {
     }
 
     public void cursorMoved(double cursorXCoord, double cursorYCoord) {
-        if (newGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            newGame.setHighlighted(true);
-        }
-        else {
-            newGame.setHighlighted(false);
-        }
-
-        if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            quit.setHighlighted(true);
-        }
-        else {
-            quit.setHighlighted(false);
-        }
+        newGame.isCursorInRange(cursorXCoord, cursorYCoord);
+        quit.isCursorInRange(cursorXCoord, cursorYCoord);
     }
 
     public void buttonPressed(ScreenState screenState, double cursorXCoord, double cursorYCoord) {
@@ -102,7 +87,6 @@ public class MenuScreen implements Screen {
             newGame.setHighlighted(false);
             screenState.setToSetupScreen();
         }
-
         if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
             screenState.quitGame();
         }

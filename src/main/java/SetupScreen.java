@@ -56,17 +56,13 @@ public class SetupScreen implements Screen {
 
         if (currentTime < moveRightMaxTime) {
             moveDirection.x = 0.09469f;
-        }
-        else if (currentTime < moveDownMaxTime) {
+        } else if (currentTime < moveDownMaxTime) {
             moveDirection.y = -0.19469f;
-        }
-        else if (currentTime < moveLeftMaxTime) {
+        } else if (currentTime < moveLeftMaxTime) {
             moveDirection.x = -0.09469f;
-        }
-        else if (currentTime < moveUpMaxTime) {
+        } else if (currentTime < moveUpMaxTime) {
             moveDirection.y = 0.19469f;
-        }
-        else {
+        } else {
             moveRightMaxTime += 240;
             moveDownMaxTime += 240;
             moveLeftMaxTime += 240;
@@ -81,19 +77,8 @@ public class SetupScreen implements Screen {
     }
 
     public void cursorMoved(double cursorXCoord, double cursorYCoord) {
-        if (mainMenu.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            mainMenu.setHighlighted(true);
-        }
-        else {
-            mainMenu.setHighlighted(false);
-        }
-
-        if (startGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            startGame.setHighlighted(true);
-        }
-        else {
-            startGame.setHighlighted(false);
-        }
+        mainMenu.isCursorInRange(cursorXCoord, cursorYCoord);
+        startGame.isCursorInRange(cursorXCoord, cursorYCoord);
     }
 
     public void buttonPressed(ScreenState screenState, double cursorXCoord, double cursorYCoord) {
@@ -101,7 +86,6 @@ public class SetupScreen implements Screen {
             mainMenu.setHighlighted(false);
             screenState.setToMenuScreen();
         }
-
         if (startGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
             startGame.setHighlighted(false);
             screenState.setToGameScreen();

@@ -18,7 +18,7 @@ public class Main {
     private long window;
     private ScreenState screenState;
 
-    public void run() {
+    private void run() {
         init();
         loop();
 
@@ -31,7 +31,6 @@ public class Main {
 
     private void init() {
         GLFWErrorCallback.createPrint(System.err).set();
-
         if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
@@ -46,17 +45,14 @@ public class Main {
                 (int) (resolutionWidth * 0.6),
                 (int) (resolutionHeight * 0.6),
                 "Real Estate Empire", NULL, NULL);
-        if ( window == NULL )
+        if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
-
         glfwSetWindowAspectRatio(window, resolutionWidth, resolutionHeight);
 
-        try ( MemoryStack stack = stackPush() ) {
+        try (MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
-
             glfwGetWindowSize(window, pWidth, pHeight);
-
             glfwSetWindowPos(
                     window,
                     (resolutionWidth - pWidth.get(0)) / 2,
@@ -136,14 +132,12 @@ public class Main {
             double[] cursorYPos = new double[1];
             glfwGetCursorPos(window, cursorXPos, cursorYPos);
 
-
             int[] windowWidth = new int[1];
             int[] windowHeight = new int[1];
             glfwGetWindowSize(window, windowWidth, windowHeight);
 
             double cursorXCoord = cursorXPos[0] / windowWidth[0];
             double cursorYCoord = cursorYPos[0] / windowHeight[0];
-
             if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
                 screenState.buttonPressed(cursorXCoord, cursorYCoord);
             }

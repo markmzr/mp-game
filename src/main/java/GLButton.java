@@ -22,11 +22,7 @@ public class GLButton extends GL2DObject {
         this.enabled = enabled;
     }
 
-    public boolean getEnabled() {
-        return enabled;
-    }
-
-    public void createCoords(int leftX, int topY, int width, int height) {
+    private void createCoords(int leftX, int topY, int width, int height) {
         int resolutionWidth = 2560;
         int resolutionHeight = 1440;
 
@@ -39,26 +35,23 @@ public class GLButton extends GL2DObject {
     public void render() {
         shader.use();
         shader.setTransform(position);
-
         if (highlighted) {
             texture[1].bind();
-        }
-        else if (enabled) {
+        } else if (enabled) {
             texture[0].bind();
-        }
-        else {
+        } else {
             texture[2].bind();
         }
-
         model.render();
     }
 
     public boolean isCursorInRange(double cursorXPos, double cursorYPos) {
         if (cursorXPos >= leftXCoord && cursorXPos <= rightXCoord
-                && cursorYPos >= topYCoord && cursorYPos <= bottomYCoord) {
+                && cursorYPos >= topYCoord && cursorYPos <= bottomYCoord && enabled) {
+            highlighted = true;
             return true;
         }
-
+        highlighted = false;
         return false;
     }
 }
