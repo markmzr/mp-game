@@ -1,247 +1,233 @@
 package realestateempire.game;
 
 import realestateempire.graphics.Button;
+import realestateempire.graphics.Button.ButtonState;
 import realestateempire.graphics.Model;
-import realestateempire.graphics.Texture;
 
-public class Property implements BoardLocation {
+import static realestateempire.game.Property.PropertyType.*;
+import static realestateempire.graphics.Button.ButtonState.*;
 
-    private final GameState gameState;
-    private final Model ownerIcon;
-    private final Model[] houses;
-    private final Button property;
-    private final int location;
-    private final int cost;
-    private final boolean railroad;
-    private final boolean utility;
-    private Model hotel;
-    private Player owner;
-    private int rent;
-    private int houseCount;
-    private boolean hotelBuilt;
-    private boolean owned;
+public class Property implements Location {
 
-    public Property(GameState gameState, int location, int cost, int rent) {
-        this.gameState = gameState;
-        houses = new Model[4];
-        this.location = location;
-        this.cost = cost;
-        this.rent = rent;
-        houseCount = 0;
-        railroad = ((location - 5) % 10) == 0;
-        utility = (location == 12 || location == 28);
-        owned = false;
-        owner = null;
-        ownerIcon = initOwnerIcon();
-        property = initButton();
+    public enum PropertyType {
+
+        STREET, RAILROAD, UTILITY
     }
 
-    public Player getOwner() {
+    private final Game game;
+    private final Model ownerToken;
+    private final Model hotel;
+    private final Model[] houses;
+    private final Button property;
+    private final PropertyType propertyType;
+    private final int location;
+    private final int price;
+    private final int rent;
+    private Player owner;
+    private int houseCount;
+    private boolean owned;
+    private boolean hotelBuilt;
+
+    Property(Game game, String[] data) {
+        this.game = game;
+        location = Integer.parseInt(data[0]);
+        price = Integer.parseInt(data[1]);
+        rent = Integer.parseInt(data[2]);
+        propertyType = PropertyType.valueOf(data[3]);
+
+        int xOwnerIcon = Integer.parseInt(data[4]);
+        int yOwnerIcon = Integer.parseInt(data[5]);
+        ownerToken = new Model("Tokens/Blank Token Small.png", xOwnerIcon, yOwnerIcon, false);
+
+        String[] propertyTextures = { data[6], data[7] };
+        int xProperty = Integer.parseInt(data[8]);
+        int yProperty = Integer.parseInt(data[9]);
+        property = new Button(propertyTextures, xProperty, yProperty);
+
+        int xHotel = Integer.parseInt(data[11]);
+        int yHotel = Integer.parseInt(data[12]);
+        hotel = new Model(data[10], xHotel, yHotel, false);
+
+        int xHouse = Integer.parseInt(data[14]);
+        int yHouse = Integer.parseInt(data[15]);
+        houses = initHouses(xHouse, yHouse);
+    }
+
+    Button getButton() {
+        return property;
+    }
+
+    int getLocation() {
+        return location;
+    }
+
+    Player getOwner() {
         return owner;
     }
 
-    public int getHouseCount() {
+    int getHouseCount() {
         return houseCount;
     }
 
-    public boolean getHotelBuilt() {
+    boolean isHotelBuilt() {
         return hotelBuilt;
     }
 
     public void render() {
-        if (hotelBuilt) {
-            hotel.render();
-        } else {
-            for (int i = 0; i < houseCount; i++) {
-                houses[i].render();
-            }
+        for (int i = 0; i < houseCount; i++) {
+            houses[i].render();
         }
+        ownerToken.render();
         property.render();
-        ownerIcon.render();
+        hotel.render();
     }
 
-    public void cursorMoved(double cursorXCoord, double cursorYCoord) {
-        property.isCursorInRange(cursorXCoord, cursorYCoord);
-    }
-
-    public void buttonPressed(double cursorXCoord, double cursorYCoord) {
-        if (property.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            gameState.getGamePrompt().setViewProperty(this);
+    public void cursorMoved(double xCursor, double yCursor) {
+        if (!game.getPrompt().isEnabled()) {
+            property.isMouseover(xCursor, yCursor);
         }
     }
 
-    public boolean playerOwns() {
-        return owned && owner.getId() == 0;
+    public void buttonPressed(double xCursor, double yCursor) {
+        if (property.isMouseover(xCursor, yCursor)) {
+            property.setButtonState(MOUSEOVER);
+            game.getPrompt().setViewProperty(this);
+        }
     }
 
-    public boolean canSellProperty() {
-        return playerOwns() && houseCount == 0 && !hotelBuilt;
+    private boolean userIsOwner() {
+        return owned && owner == game.getUser();
     }
 
-    public boolean canBuildHouse() {
-        return playerOwns() && owner.getMoney() >= 100
-                && !railroad && !utility && houseCount <= 4 && !hotelBuilt;
+    ButtonState canSellProperty() {
+        if (userIsOwner() && houseCount == 0) {
+            return ENABLED;
+        }
+        return DISABLED;
     }
 
-    public boolean canSellHouse() {
-        return playerOwns() && houseCount > 0;
+    ButtonState canBuyHouse() {
+        if (userIsOwner() && propertyType == STREET
+                && owner.getMoney() >= 100 && !hotelBuilt) {
+            return ENABLED;
+        }
+        return DISABLED;
+    }
+
+    ButtonState canSellHouse() {
+        if (userIsOwner() && houseCount > 0) {
+            return ENABLED;
+        }
+        return DISABLED;
     }
 
     public void playerLanded() {
-        Player player = gameState.getCurrentPlayer();
-        player.setTokenMoving(false);
-
-        if (!owned) {
-            if (player.getMoney() >= cost) {
-                if (player.getId() == 0) {
-                    gameState.getGamePrompt().setBuyProperty(this);
+        Player player = game.getCurrentPlayer();
+        if (owned) {
+            if (player != owner) {
+                payRent();
+            }
+        } else {
+            if (player.getMoney() >= price) {
+                if (player.isUser()) {
+                    if (player == game.getUser()) {
+                        game.getPrompt().setBuyProperty();
+                    }
                 } else {
                     buyProperty();
                 }
-            } else {
-                gameState.turnCompleted();
             }
-        } else if (player != owner) {
-            payRent();
-        } else {
-            gameState.turnCompleted();
         }
     }
 
     public void buyProperty() {
         owned = true;
-        owner = gameState.getCurrentPlayer();
-        ownerIcon.setTexture(owner.getToken().getTexture());
-        owner.updateMoney(-1 * cost);
-
-        if (railroad) {
-            int railroadsOwned = owner.getRailroadsOwned() + 1;
-            owner.setRailroadsOwned(railroadsOwned);
-
-            if (railroadsOwned <= 2) {
-                rent = railroadsOwned * 25;
-            } else if (railroadsOwned == 3) {
-                rent = 100;
-            } else {
-                rent = 200;
-            }
-        } else if (utility) {
+        owner = game.getCurrentPlayer();
+        owner.updateMoney(-1 * price);
+        ownerToken.setTextures(0, owner.getToken().getTexture());
+        ownerToken.setVisible(true);
+        if (propertyType == RAILROAD) {
+            owner.setRailroadsOwned(owner.getRailroadsOwned() + 1);
+        } else if (propertyType == UTILITY) {
             owner.setUtilitiesOwned(owner.getUtilitiesOwned() + 1);
         }
-        gameState.turnCompleted();
     }
 
     public void sellProperty() {
-        owner.updateMoney((int)(0.5 * cost));
+        if (propertyType == RAILROAD) {
+            owner.setRailroadsOwned(owner.getRailroadsOwned() - 1);
+        } else if (propertyType == UTILITY) {
+            owner.setUtilitiesOwned(owner.getUtilitiesOwned() - 1);
+        }
+        int sellPrice = (int) Math.round(0.5 * price);
+        owner.updateMoney(sellPrice);
         owned = false;
-        owner = null;
-        ownerIcon.setTexture(new Texture("Tokens/Blank Token.png"));
+        ownerToken.setVisible(false);
     }
 
     private void payRent() {
-        Player player = gameState.getCurrentPlayer();
-        if (utility) {
-            int diceRoll = gameState.getDiceRoll();
-            if (player.getUtilitiesOwned() == 1) {
-                rent = diceRoll * 4;
+        int rentTotal = rent;
+        if (propertyType == STREET) {
+            rentTotal += hotelBuilt ? 500 : 100 * houseCount;
+        } else if (propertyType == RAILROAD) {
+            int railroadsOwned = owner.getRailroadsOwned();
+            if (railroadsOwned <= 2) {
+                rentTotal = railroadsOwned * 25;
+            } else if (railroadsOwned == 3) {
+                rentTotal = 100;
             } else {
-                rent = diceRoll * 10;
+                rentTotal = 200;
             }
+        } else {
+            int diceRoll = game.getDiceRoll();
+            int multiplier = owner.getUtilitiesOwned() == 1 ? 4 : 10;
+            rentTotal = diceRoll * multiplier;
         }
-        player.updateMoney(-1 * rent);
-        owner.updateMoney(rent);
-        gameState.turnCompleted();
+        game.getCurrentPlayer().updateMoney(-1 * rentTotal);
+        owner.updateMoney(rentTotal);
     }
 
     public void buyHouse() {
         if (houseCount < 4) {
-            if (location < 10) {
-                int x = 1217 - (117 * (location - 1)) - (27 * houseCount);
-                houses[houseCount] = new Model("House.png", x, 1253);
-            } else if (location < 20) {
-                int y = 1217 - (117 * (location - 11)) - (27 * houseCount);
-                houses[houseCount] = new Model("House Side.png", 152, y);
-            } else if (location < 30) {
-                int x = 200 + (117 * (location - 21)) + (27 * houseCount);
-                houses[houseCount] = new Model("House.png", x, 152);
-            } else {
-                int y = 200 + (117 * (location - 31)) + (27 * houseCount);
-                houses[houseCount] = new Model("House Side.png", 1253, y);
-            }
             houseCount++;
-            rent += 100;
-            owner.updateMoney(-100);
         } else {
-            buyHotel();
+            hotel.setVisible(true);
+            hotelBuilt = true;
+            houseCount = 0;
         }
-    }
-
-    private void buyHotel() {
-        if (location < 10) {
-            int x = 1163 - (117 * (location - 1));
-            hotel = new Model("Hotel.png", x, 1253);
-        } else if (location < 20) {
-            int y = 1163 - (117 * (location - 11));
-            hotel = new Model("Hotel Side.png", 152, y);
-        } else if (location < 30) {
-            int x = 1163 - (117 * (29 - location));
-            hotel = new Model("Hotel.png", x, 152);
-        } else {
-            int y = 1163 - (117 * (39 - location));
-            hotel = new Model("Hotel Side.png", 1253, y);
-        }
-        hotelBuilt = true;
-        rent += 100;
         owner.updateMoney(-100);
     }
 
     public void sellHouse() {
         if (hotelBuilt) {
+            hotel.setVisible(false);
             hotelBuilt = false;
+            houseCount = 4;
         } else {
             houseCount--;
         }
-        rent -= 100;
         owner.updateMoney(50);
     }
 
-    private Model initOwnerIcon() {
-        Model ownerIcon;
+    private Model[] initHouses(int x, int y) {
+        Model[] houses = new Model[4];
         if (location < 10) {
-            int x = 1168 - (117 * (location - 1));
-            ownerIcon = new Model("Tokens/Blank Token Small.png", x, 1208);
+            for (int i = 0; i < houses.length; i++) {
+                houses[i] = new Model("Tokens/House.png", x - (27 * i), y);
+            }
         } else if (location < 20) {
-            int y = 1175 - (117 * (location - 11));
-            ownerIcon = new Model("Tokens/Blank Token Small.png", 206, y);
+            for (int i = 0; i < houses.length; i++) {
+                houses[i] = new Model("Tokens/House Side.png", 152, y - (27 * i));
+            }
         } else if (location < 30) {
-            int x = 1168 - (117 * (29 - location));
-            ownerIcon = new Model("Tokens/Blank Token Small.png", x, 206);
+            for (int i = 0; i < houses.length; i++) {
+                houses[i] = new Model("Tokens/House.png", x + (27 * i), 152);
+            }
         } else {
-            int y = 1175 - (117 * (39 - location));
-            ownerIcon = new Model("Tokens/Blank Token Small.png", 1194, y);
+            for (int i = 0; i < houses.length; i++) {
+                houses[i] = new Model("Tokens/House Side.png", 1253, y + (27 * i));
+            }
         }
-        return ownerIcon;
-    }
-
-    private Button initButton() {
-        Button property;
-        if (location < 10) {
-            String[] propertyTextures = { "Property Empty.png", "Property Highlight.png" };
-            int x = 1124 - (117 * (location - 1));
-            property = new Button(propertyTextures, x, 1241);
-        } else if (location < 20) {
-            String[] propertyTextures = { "Property Side Empty.png", "Property Side Highlight.png" };
-            int y = 1124 - (117 * (location - 11));
-            property = new Button(propertyTextures, -3, y);
-        } else if (location < 30) {
-            String[] propertyTextures = { "Property Empty.png", "Property Highlight.png" };
-            int x = 187 + (117 * (location - 21));
-            property = new Button(propertyTextures, x, -3);
-        } else {
-            String[] propertyTextures = { "Property Side Empty.png", "Property Side Highlight.png" };
-            int y = 188 + (117 * (location - 31));
-            property = new Button(propertyTextures, 1241, y);
-        }
-        return property;
+        return houses;
     }
 }

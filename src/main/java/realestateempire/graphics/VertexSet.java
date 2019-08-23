@@ -6,13 +6,13 @@ import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.opengl.GL30.*;
 
-public class VertexSet {
+class VertexSet {
 
     private final int drawCount;
     private final int vertexId;
     private final int textureId;
 
-    public VertexSet(int x, int y, int width, int height) {
+    VertexSet(int x, int y, int width, int height) {
         float[] vertices = createVertices(x, y, width, height);
         drawCount = vertices.length / 3;
         vertexId = glGenBuffers();
@@ -34,7 +34,7 @@ public class VertexSet {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    public void render() {
+    void render() {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
@@ -53,19 +53,19 @@ public class VertexSet {
         int halfResWidth = 1280;
         int halfResHeight = 720;
 
-        float leftX = (float)(x - halfResWidth) / halfResWidth;
-        float rightX = (float)(x + width - halfResWidth) / halfResWidth;
-        float topY = (float)(halfResHeight - y) / halfResHeight;
-        float bottomY = (float)(halfResHeight - y - height) / halfResHeight;
+        float xLeft = (float)(x - halfResWidth) / halfResWidth;
+        float xRight = (float)(x + width - halfResWidth) / halfResWidth;
+        float yTop = (float)(halfResHeight - y) / halfResHeight;
+        float yBottom = (float)(halfResHeight - y - height) / halfResHeight;
 
         float[] vertices = new float[] {
-                leftX, topY, 0f,
-                rightX, topY, 0f,
-                rightX, bottomY, 0f,
+                xLeft, yTop, 0f,
+                xRight, yTop, 0f,
+                xRight, yBottom, 0f,
 
-                rightX, bottomY, 0f,
-                leftX, bottomY, 0f,
-                leftX, topY, 0f,
+                xRight, yBottom, 0f,
+                xLeft, yBottom, 0f,
+                xLeft, yTop, 0f,
         };
         return vertices;
     }

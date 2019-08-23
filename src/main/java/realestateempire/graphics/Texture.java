@@ -4,26 +4,32 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
+
+import realestateempire.Main;
 
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 
-public class Texture {
+class Texture {
 
     private final int id;
     private final int width;
     private final int height;
 
-    public Texture(String filename) {
+    Texture(String file) {
         IntBuffer x = BufferUtils.createIntBuffer(1);
         IntBuffer y = BufferUtils.createIntBuffer(1);
         IntBuffer channels = BufferUtils.createIntBuffer(1);
-        ByteBuffer data = stbi_load("./Textures/" + filename, x, y, channels, 4);
-
-        id = glGenTextures();
+        ByteBuffer textureData = stbi_load("./Textures/" + file, x, y, channels, 4);
         width = x.get();
         height = y.get();
+
+        GLFW.glfwMakeContextCurrent(Main.getWindow());
+        GL.createCapabilities();
+        id = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, id);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -32,20 +38,19 @@ public class Texture {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        stbi_image_free(data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+        stbi_image_free(textureData);
     }
 
-    public int getWidth() {
+    int getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    int getHeight() {
         return height;
     }
 
-    public void bind() {
-        glActiveTexture(GL_TEXTURE0);
+    void bind() {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 }

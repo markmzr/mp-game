@@ -1,52 +1,50 @@
 package realestateempire.graphics;
 
+import static realestateempire.graphics.Button.ButtonState.*;
+
 public class Button extends Model {
 
-    private final double leftX;
-    private final double rightX;
-    private final double topY;
-    private final double bottomY;
-    private boolean enabled;
-    private boolean highlighted;
+    public enum ButtonState {
 
-    public Button(String[] textureFilenames, int x, int y) {
-        super(textureFilenames, x, y);
-        leftX = x / 2560.0;
-        rightX = (x + getWidth()) / 2560.0;
-        topY = y / 1440.0;
-        bottomY = (y + getHeight()) / 1440.0;
-        highlighted = false;
-        enabled = true;
-    }
+        ENABLED (0), MOUSEOVER (1), DISABLED (2);
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+        private final int texture;
 
-    public void setHighlighted(boolean highlighted) {
-        this.highlighted = highlighted;
-    }
-
-    public void render() {
-        shader.use();
-        shader.setTransform(position);
-        if (highlighted) {
-            textures[1].bind();
-        } else if (enabled) {
-            textures[0].bind();
-        } else {
-            textures[2].bind();
+        ButtonState(int texture) {
+            this.texture = texture;
         }
-        vertexSet.render();
     }
 
-    public boolean isCursorInRange(double cursorX, double cursorY) {
-        if (enabled && cursorX >= leftX && cursorX <= rightX
-                && cursorY >= topY && cursorY <= bottomY) {
-            highlighted = true;
+    private final double xLeft;
+    private final double xRight;
+    private final double yTop;
+    private final double yBottom;
+    private ButtonState buttonState;
+
+    public Button(String[] textureFiles, int x, int y) {
+        super(textureFiles, x, y);
+        xLeft = x / 2560.0;
+        xRight = (x + getWidth()) / 2560.0;
+        yTop = y / 1440.0;
+        yBottom = (y + getHeight()) / 1440.0;
+        buttonState = ENABLED;
+    }
+
+    public void setButtonState(ButtonState buttonState) {
+        this.buttonState = buttonState;
+        setTexture(buttonState.texture);
+    }
+
+    public boolean isMouseover(double xCursor, double yCursor) {
+        if (xCursor >= xLeft && xCursor <= xRight
+                && yCursor >= yTop && yCursor <= yBottom) {
+            if (buttonState == ENABLED) {
+                setButtonState(MOUSEOVER);
+            }
             return true;
+        } else if (buttonState == MOUSEOVER) {
+            setButtonState(ENABLED);
         }
-        highlighted = false;
         return false;
     }
 }

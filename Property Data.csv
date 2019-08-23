@@ -1,0 +1,29 @@
+location,price,rent,propertyType,ownerIcon x,ownerIcon y,property texture,property texture highlighted,property x,property y,hotel texture,hotel x,hotel y,house texture,house x,house y
+1,60,2,STREET,1168,1208,Buttons/Property Empty.png,Buttons/Property M.png,1124,1241,Tokens/Hotel.png,1163,1253,Tokens/House.png,1217,1253
+3,60,4,STREET,934,1208,Buttons/Property Empty.png,Buttons/Property M.png,890,1241,Tokens/Hotel.png,929,1253,Tokens/House.png,983,1253
+5,200,6,RAILROAD,700,1208,Buttons/Property Empty.png,Buttons/Property M.png,656,1241,Tokens/Hotel.png,695,1253,Tokens/House.png,749,1253
+6,100,6,STREET,583,1208,Buttons/Property Empty.png,Buttons/Property M.png,539,1241,Tokens/Hotel.png,578,1253,Tokens/House.png,632,1253
+8,100,6,STREET,349,1208,Buttons/Property Empty.png,Buttons/Property M.png,305,1241,Tokens/Hotel.png,344,1253,Tokens/House.png,398,1253
+9,120,8,STREET,232,1208,Buttons/Property Empty.png,Buttons/Property M.png,188,1241,Tokens/Hotel.png,227,1253,Tokens/House.png,281,1253
+11,140,10,STREET,206,1175,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,1124,Tokens/Hotel Side.png,152,1163,Tokens/House Side.png,152,1217
+12,150,6,UTILITY,206,1058,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,1007,Tokens/Hotel Side.png,152,1046,Tokens/House Side.png,152,1100
+13,140,10,STREET,206,941,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,890,Tokens/Hotel Side.png,152,929,Tokens/House Side.png,152,983
+14,160,12,STREET,206,824,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,773,Tokens/Hotel Side.png,152,812,Tokens/House Side.png,152,866
+15,200,6,RAILROAD,206,707,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,656,Tokens/Hotel Side.png,152,695,Tokens/House Side.png,152,749
+16,180,14,STREET,206,590,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,539,Tokens/Hotel Side.png,152,578,Tokens/House Side.png,152,632
+18,180,14,STREET,206,356,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,305,Tokens/Hotel Side.png,152,344,Tokens/House Side.png,152,398
+19,200,16,STREET,206,239,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,188,Tokens/Hotel Side.png,152,227,Tokens/House Side.png,152,281
+21,220,18,STREET,232,206,Buttons/Property Empty.png,Buttons/Property M.png,187,-3,Tokens/Hotel.png,227,152,Tokens/House.png,200,152
+23,220,18,STREET,466,206,Buttons/Property Empty.png,Buttons/Property M.png,421,-3,Tokens/Hotel.png,461,152,Tokens/House.png,434,152
+24,240,20,STREET,583,206,Buttons/Property Empty.png,Buttons/Property M.png,538,-3,Tokens/Hotel.png,578,152,Tokens/House.png,551,152
+25,200,6,RAILROAD,700,206,Buttons/Property Empty.png,Buttons/Property M.png,655,-3,Tokens/Hotel.png,695,152,Tokens/House.png,668,152
+26,260,22,STREET,817,206,Buttons/Property Empty.png,Buttons/Property M.png,772,-3,Tokens/Hotel.png,812,152,Tokens/House.png,785,152
+27,260,22,STREET,934,206,Buttons/Property Empty.png,Buttons/Property M.png,889,-3,Tokens/Hotel.png,929,152,Tokens/House.png,902,152
+28,150,6,UTILITY,1051,206,Buttons/Property Empty.png,Buttons/Property M.png,1006,-3,Tokens/Hotel.png,1046,152,Tokens/House.png,1019,152
+29,280,24,STREET,1168,206,Buttons/Property Empty.png,Buttons/Property M.png,1123,-3,Tokens/Hotel.png,1163,152,Tokens/House.png,1136,152
+31,300,26,STREET,1194,239,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,188,Tokens/Hotel Side.png,1253,227,Tokens/House Side.png,1253,200
+32,300,26,STREET,1194,356,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,305,Tokens/Hotel Side.png,1253,344,Tokens/House Side.png,1253,317
+34,320,28,STREET,1194,590,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,539,Tokens/Hotel Side.png,1253,578,Tokens/House Side.png,1253,551
+35,200,6,RAILROAD,1194,707,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,656,Tokens/Hotel Side.png,1253,695,Tokens/House Side.png,1253,668
+37,350,35,STREET,1194,941,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,890,Tokens/Hotel Side.png,1253,929,Tokens/House Side.png,1253,902
+39,400,50,STREET,1194,1175,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,1124,Tokens/Hotel Side.png,1253,1163,Tokens/House Side.png,1253,1136

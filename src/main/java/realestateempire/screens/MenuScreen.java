@@ -7,87 +7,92 @@ import realestateempire.graphics.Model;
 import realestateempire.graphics.Button;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
+import static realestateempire.graphics.Button.ButtonState.ENABLED;
 
 public class MenuScreen implements Screen {
 
     private final Model background;
     private final Model logo;
-    private final Button newGame;
+    private final Button singleplayer;
+    private final Button multiplayer;
     private final Button quit;
     private double prevTime;
-    private double moveLeftMaxTime;
-    private double moveRightMaxTime;
-    private double moveUpMaxTime;
-    private double moveDownMaxTime;
 
-    public MenuScreen() {
+    MenuScreen() {
         background = new Model("Background Large.png", -8014, -9134);
         logo = new Model("Logo.png", 256, 100);
 
-        String[] newGameTextures = { "Buttons/New Game.png", "Buttons/New Game Highlighted.png" };
-        newGame = new Button(newGameTextures, 1070, 660);
+        String[] newGameTextures = { "Buttons/Singleplayer.png",
+                "Buttons/Singleplayer M.png" };
+        singleplayer = new Button(newGameTextures, 1070, 560);
 
-        String[] quitTextures = { "Buttons/Quit Large.png", "Buttons/Quit Large Highlighted.png" };
-        quit = new Button(quitTextures, 1070, 820);
+        String[] multiplayerTextures = { "Buttons/Multiplayer.png",
+                "Buttons/Multiplayer M.png" };
+        multiplayer = new Button(multiplayerTextures, 1070, 720);
 
+        String[] quitTextures = { "Buttons/Quit Large.png",
+                "Buttons/Quit Large M.png" };
+        quit = new Button(quitTextures, 1070, 880);
         prevTime = 0;
-        moveRightMaxTime = 60;
-        moveDownMaxTime = 120;
-        moveLeftMaxTime = 180;
-        moveUpMaxTime = 240;
     }
 
-    public void setBackgroundPosition(Matrix4f position) {
+    void setBackgroundPosition(Matrix4f position) {
         background.setPosition(position);
     }
 
-    public void setPrevTime(double prevTime) {
+    void setPrevTime(double prevTime) {
         this.prevTime = prevTime;
     }
 
     @Override
     public void render() {
-        double currentTime = glfwGetTime();
-        double deltaTime = currentTime - prevTime;
-        prevTime = currentTime;
-        Vector3f moveDirection = new Vector3f(0, 0, 0);
-
-        if (currentTime < moveRightMaxTime) {
-            moveDirection.x = background.pixelXToCoord(133.56);
-        } else if (currentTime < moveDownMaxTime) {
-            moveDirection.y = background.pixelYToCoord(-152.23);
-        } else if (currentTime < moveLeftMaxTime) {
-            moveDirection.x = background.pixelXToCoord(-133.56);
-        } else if (currentTime < moveUpMaxTime) {
-            moveDirection.y = background.pixelYToCoord(152.23);
-        } else {
-            moveRightMaxTime += 240;
-            moveDownMaxTime += 240;
-            moveLeftMaxTime += 240;
-            moveUpMaxTime += 240;
-        }
-        moveDirection.mul((float)deltaTime);
-        background.movePosition(moveDirection);
+        moveBackground();
         background.render();
         logo.render();
-        newGame.render();
+        singleplayer.render();
+        multiplayer.render();
         quit.render();
     }
 
     @Override
-    public void cursorMoved(double cursorXCoord, double cursorYCoord) {
-        newGame.isCursorInRange(cursorXCoord, cursorYCoord);
-        quit.isCursorInRange(cursorXCoord, cursorYCoord);
+    public void cursorMoved(double xCursor, double yCursor) {
+        singleplayer.isMouseover(xCursor, yCursor);
+        multiplayer.isMouseover(xCursor, yCursor);
+        quit.isMouseover(xCursor, yCursor);
     }
 
     @Override
-    public void buttonPressed(ScreenState screenState, double cursorXCoord, double cursorYCoord) {
-        if (newGame.isCursorInRange(cursorXCoord, cursorYCoord)) {
-            newGame.setHighlighted(false);
+    public void buttonPressed(ScreenState screenState, double xCursor, double yCursor) {
+        if (singleplayer.isMouseover(xCursor, yCursor)) {
+            singleplayer.setButtonState(ENABLED);
             screenState.setToSetupScreen(background.getPosition(), prevTime);
         }
-        if (quit.isCursorInRange(cursorXCoord, cursorYCoord)) {
+        if (multiplayer.isMouseover(xCursor, yCursor)) {
+            multiplayer.setButtonState(ENABLED);
+            screenState.setToMultiplayerScreen(background.getPosition(), prevTime);
+        }
+        if (quit.isMouseover(xCursor, yCursor)) {
             screenState.quitGame();
         }
+    }
+
+    private void moveBackground() {
+        double time = glfwGetTime() % 240;
+        prevTime = prevTime >= time ? 0 : prevTime;
+        double deltaTime = time - prevTime;
+        prevTime = time;
+
+        Vector3f direction = new Vector3f(0, 0, 0);
+        if (time < 60) {
+            direction.x = Model.xToCoord(133.56);
+        } else if (time < 120) {
+            direction.y = Model.yToCoord(-152.23);
+        } else if (time < 180) {
+            direction.x = Model.xToCoord(-133.56);
+        } else if (time < 240) {
+            direction.y = Model.yToCoord(152.23);
+        }
+        direction.mul((float) deltaTime);
+        background.movePosition(direction);
     }
 }

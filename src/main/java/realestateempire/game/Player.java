@@ -1,92 +1,95 @@
 package realestateempire.game;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 import org.joml.Vector3f;
 
 import realestateempire.graphics.Model;
 import realestateempire.graphics.Text;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
+import static realestateempire.game.Player.PlayerState.*;
 
 public class Player {
 
-    private final GameState gameState;
+    public enum PlayerState {
+
+        ACTIVE, IN_JAIL, BANKRUPT
+    }
+
+    private static final Vector3f[] tokenDirections = initTokenDirections();
+    private final Game game;
+    private final Model name;
     private final Model avatar;
     private final Model token;
-    private final Model bankruptSign;
+    private final Model bankrupt;
     private final Text moneyText;
     private final Text moneyDelta;
-    private final int id;
+    private final boolean user;
+    private PlayerState playerState;
     private int money;
     private int currentLocation;
     private int newLocation;
     private int railroadsOwned;
     private int utilitiesOwned;
-    private boolean tokenMoving;
-    private boolean inJail;
-    private boolean bankrupt;
-    private double deltaTime;
     private double prevTime;
+    private double deltaTime;
+    private boolean moving;
 
-    public Player(GameState gameState, int id) {
-        this.gameState = gameState;
-        avatar = new Model("Tokens/Blank Token.png", 1527, 87);
-        String[] tokenTextures = { "Tokens/Blank Token.png", "Tokens/Blank Token Small.png" };
-        token = new Model(tokenTextures, 1335, 1344);
-        bankruptSign = new Model("Bankrupt.png", 2198, 87);
-        moneyDelta = new Text("+$0", 1900, 82);
+    public Player(Game game, boolean user, int id, String nameTexture, String[] tokenTextures) {
+        this.game = game;
+        this.user = user;
+        int yDelta = 165 * id;
+        name = new Model(nameTexture, 1628, 88 + yDelta);
+        avatar = new Model(tokenTextures[0], 1527, 87 + yDelta);
+        token = new Model(tokenTextures, 1310, 1321);
+        bankrupt = new Model("Player/Bankrupt.png", 2198, 87 + yDelta);
+        bankrupt.setVisible(false);
 
-        this.id = id;
+        playerState = ACTIVE;
         money = 1500;
+        moneyDelta = new Text("+$0", 1900, 82 + yDelta);
+        moneyText = new Text("$" + money, 2243, 82 + yDelta);
         currentLocation = 0;
         newLocation = 0;
         railroadsOwned = 0;
         utilitiesOwned = 0;
-        tokenMoving = false;
-        inJail = false;
-        bankrupt = false;
         prevTime = 0;
-
-        moneyText = new Text("$" + Integer.toString(money), 2243, 82);
-        Vector3f direction = new Vector3f(0f, avatar.pixelYToCoord(-165) * id, 0f);
-        avatar.movePosition(direction);
-        bankruptSign.movePosition(direction);
-        moneyText.movePosition(direction);
-        moneyDelta.movePosition(direction);
+        deltaTime = 0;
+        moving = false;
     }
 
-    public void setRailroadsOwned(int railroadsOwned) {
+    public void setPlayerState(PlayerState playerState) {
+        this.playerState = playerState;
+    }
+
+    void setRailroadsOwned(int railroadsOwned) {
         this.railroadsOwned = railroadsOwned;
     }
 
-    public void setUtilitiesOwned(int utilitiesOwned) {
+    void setUtilitiesOwned(int utilitiesOwned) {
         this.utilitiesOwned = utilitiesOwned;
     }
 
-    public void setTokenMoving(boolean tokenMoving) {
-        this.tokenMoving = tokenMoving;
-    }
-
-    public void setInJail(boolean inJail) {
-        this.inJail = inJail;
-    }
-
-    public void setBankrupt(boolean bankrupt) {
-        this.bankrupt = bankrupt;
-    }
-
-    public Model getAvatar() {
-        return avatar;
+    public void setMoving(boolean moving) {
+        this.moving = moving;
     }
 
     public Model getToken() {
         return token;
     }
 
-    public int getId() {
-        return id;
+    public boolean isUser() {
+        return user;
     }
 
-    public int getMoney() {
+    public PlayerState getPlayerState() {
+        return playerState;
+    }
+
+    int getMoney() {
         return money;
     }
 
@@ -94,105 +97,106 @@ public class Player {
         return currentLocation;
     }
 
-    public int getRailroadsOwned() {
+    int getRailroadsOwned() {
         return railroadsOwned;
     }
 
-    public int getUtilitiesOwned() {
+    int getUtilitiesOwned() {
         return utilitiesOwned;
     }
 
-    public boolean getInJail() {
-        return inJail;
-    }
-
-    public boolean getBankrupt() {
-        return bankrupt;
+    boolean isMoving() {
+        return moving;
     }
 
     public void updateMoney(int amount) {
         money += amount;
         if (money < 0) {
-            gameState.declareBankruptcy(this);
+            token.setVisible(false);
+            moneyText.setVisible(false);
+            moneyDelta.setVisible(false);
+            bankrupt.setVisible(true);
+            playerState = BANKRUPT;
+            game.playerBankrupt(user);
         } else {
             if (amount >= 0) {
-                moneyDelta.setText("+$" + Integer.toString(amount));
+                moneyDelta.updateText("+$" + amount);
             } else {
-                moneyDelta.setText("-$" + Integer.toString(-1 * amount));
+                moneyDelta.updateText("-$" + (-1 * amount));
             }
-            moneyText.setText("$" + Integer.toString(money));
+            moneyText.updateText("$" + money);
         }
     }
 
     public void updateMoneyDelta(String text) {
-        moneyDelta.setText(text);
+        moneyDelta.updateText(text);
     }
 
     public void updateLocation(int diceRoll) {
         newLocation = currentLocation + diceRoll;
         newLocation = newLocation >= 40 ? newLocation - 40 : newLocation;
-        tokenMoving = true;
+        moving = true;
         deltaTime = 0;
         prevTime = glfwGetTime();
     }
 
     public void render() {
-        double currentTime = glfwGetTime();
-        deltaTime += currentTime - prevTime;
-        prevTime = currentTime;
-
-        if (tokenMoving) {
-            if (currentLocation == newLocation) {
-                gameState.playerLanded();
-            } else if (deltaTime >= 0.5) {
-                moveToken();
-                deltaTime = 0;
-            }
+        if (moving) {
+            moveToken();
         }
-        if (bankrupt) {
-            bankruptSign.render();
-        } else {
-            token.render();
-            moneyText.render();
-            moneyDelta.render();
-        }
+        name.render();
         avatar.render();
+        token.render();
+        bankrupt.render();
+        moneyText.render();
+        moneyDelta.render();
     }
 
     private void moveToken() {
-        Vector3f direction = new Vector3f(0f, 0f, 0f);
-        if (currentLocation < 10) {
-            if (currentLocation == 0 || currentLocation == 9) {
-                direction.x = token.pixelXToCoord(-179);
+        double time = glfwGetTime();
+        deltaTime += time - prevTime;
+        prevTime = time;
+
+        if (currentLocation == newLocation) {
+            moving = false;
+            game.playerLanded();
+        } else if (deltaTime >= 0.75) {
+            if (currentLocation == 9 && playerState == IN_JAIL) {
+                float x = Model.xToCoord(-125);
+                float y = Model.yToCoord(55);
+                token.movePosition(new Vector3f(x, y, 0));
             } else {
-                direction.x = token.pixelXToCoord(-117);
+                token.movePosition(tokenDirections[currentLocation]);
             }
-        } else if (currentLocation < 20) {
-            if (currentLocation == 10 || currentLocation == 19) {
-                direction.y = token.pixelYToCoord(177);
-            } else {
-                direction.y = token.pixelYToCoord(117);
-            }
-        } else if (currentLocation < 30) {
-            if (currentLocation == 20 || currentLocation == 29) {
-                direction.x = token.pixelXToCoord(179);
-            } else {
-                direction.x = token.pixelXToCoord(117);
-            }
-        } else {
-            if (currentLocation == 30 || currentLocation == 39) {
-                direction.y = token.pixelYToCoord(-179);
-            } else {
-                direction.y = token.pixelYToCoord(-117);
+            deltaTime = 0;
+            currentLocation++;
+            if (currentLocation >= 40) {
+                currentLocation = 0;
+                if (newLocation > 0 && playerState != IN_JAIL) {
+                    updateMoney(200);
+                }
             }
         }
-        token.movePosition(direction);
-        currentLocation++;
-        if (currentLocation >= 40) {
-            currentLocation = 0;
-            if (newLocation > 0 && !inJail) {
-                updateMoney(200);
+    }
+
+    private static Vector3f[] initTokenDirections() {
+        Vector3f[] tokenDirections = new Vector3f[40];
+        try {
+            File file = new File("Player Data.csv");
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            reader.readLine();
+            String line;
+            int i = 0;
+            while ((line = reader.readLine()) != null) {
+                String[] vectorData = line.split(",");
+                float x = Float.parseFloat(vectorData[0]);
+                float y = Float.parseFloat(vectorData[1]);
+                tokenDirections[i] = new Vector3f(Model.xToCoord(x), Model.yToCoord(y), 0);
+                i++;
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+        return tokenDirections;
     }
 }

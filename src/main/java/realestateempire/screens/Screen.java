@@ -1,8 +1,8 @@
 package realestateempire.screens;
 
-public interface Screen {
+interface Screen {
 
     void render();
-    void cursorMoved(double cursorXCoord, double cursorYCoord);
-    void buttonPressed(ScreenState screenState, double cursorXCoord, double cursorYCoord);
+    void cursorMoved(double xCursor, double yCursor);
+    void buttonPressed(ScreenState screenState, double xCursor, double yCursor);
 }

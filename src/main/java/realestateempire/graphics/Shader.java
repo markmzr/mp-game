@@ -1,6 +1,7 @@
 package realestateempire.graphics;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -11,48 +12,30 @@ import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.opengl.GL30.*;
 
-public class Shader {
+class Shader {
 
     private final int program;
 
-    public Shader() {
+    Shader() {
         program = glCreateProgram();
-
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, readFile("VertexShader.vs"));
         glCompileShader(vertexShader);
-        if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) != 1) {
-            System.err.println(glGetShaderInfoLog(vertexShader));
-            System.exit(1);
-        }
 
         int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragmentShader, readFile("FragmentShader.fs"));
         glCompileShader(fragmentShader);
-        if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) != 1) {
-            System.err.println(glGetShaderInfoLog(fragmentShader));
-            System.exit(1);
-        }
 
         glAttachShader(program, vertexShader);
         glAttachShader(program, fragmentShader);
         glBindAttribLocation(program, 0, "vertices");
         glBindAttribLocation(program, 1, "texCoord");
-
         glLinkProgram(program);
-        if (glGetProgrami(program, GL_LINK_STATUS) != 1) {
-            System.err.println(glGetProgramInfoLog(program));
-            System.exit(1);
-        }
-
         glValidateProgram(program);
-        if (glGetProgrami(program, GL_VALIDATE_STATUS) != 1) {
-            System.err.println(glGetProgramInfoLog(program));
-            System.exit(1);
-        }
     }
 
-    public void setTransform(Matrix4f transform) {
+    void use(Matrix4f transform) {
+        glUseProgram(program);
         int location = glGetUniformLocation(program, "transform");
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         transform.get(buffer);
@@ -61,18 +44,11 @@ public class Shader {
         }
     }
 
-    public void use() {
-        glUseProgram(program);
-        int location = glGetUniformLocation(program, "sampler");
-        if (location != -1) {
-            glUniform1i(location, 0);
-        }
-    }
-
     private String readFile(String filename) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("./Shaders/" + filename));
+            File file = new File("./Shaders/" + filename);
+            BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line + "\n");
