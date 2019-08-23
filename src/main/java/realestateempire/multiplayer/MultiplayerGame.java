@@ -80,25 +80,25 @@ public class MultiplayerGame extends Game {
                     eventTime = glfwGetTime() + 2;
                 }
             }
-            die1.setVisible(false);
-            die2.setVisible(false);
+            dieLeft.setVisible(false);
+            dieRight.setVisible(false);
         }
     }
 
     @Override
     public void rollDice() {
         Random random = new Random();
-        int die1Val = random.nextInt(6);
-        int die2Val = random.nextInt(6);
-        die1.setTexture(die1Val);
-        die2.setTexture(die2Val);
-        die1.setVisible(true);
-        die2.setVisible(true);
+        int dieLeftVal = random.nextInt(6);
+        int dieRightVal = random.nextInt(6);
+        dieLeft.setTexture(dieLeftVal);
+        dieRight.setTexture(dieRightVal);
+        dieLeft.setVisible(true);
+        dieRight.setVisible(true);
         
-        diceRoll = die1Val + die2Val + 2;
-        currentPlayer.updateLocation(diceRoll);
+        diceTotal = dieLeftVal + dieRightVal + 2;
+        currentPlayer.updateLocation(diceTotal);
         timedEvent = NONE;
-        sendEvent(new MultiplayerEvent(DICE_ROLL, die1Val, die2Val));
+        sendEvent(new MultiplayerEvent(DICE_ROLL, dieLeftVal, dieRightVal));
     }
 
     @Override
@@ -117,6 +117,31 @@ public class MultiplayerGame extends Game {
         property.buyProperty();
         sendEvent(new MultiplayerEvent(BUY_PROPERTY, location));
     }
+
+    @Override
+    public void sellProperty() {
+        int location = currentPlayer.getCurrentLocation();
+        Property property = (Property) board.getLocation(location);
+        property.sellProperty();
+        sendEvent(new MultiplayerEvent(SELL_PROPERTY, location));
+    }
+
+    @Override
+    public void buyHouse() {
+        int location = currentPlayer.getCurrentLocation();
+        Property property = (Property) board.getLocation(location);
+        property.buyHouse();
+        sendEvent(new MultiplayerEvent(BUY_HOUSE, location));
+    }
+
+    @Override
+    public void sellHouse() {
+        int location = currentPlayer.getCurrentLocation();
+        Property property = (Property) board.getLocation(location);
+        property.sellHouse();
+        sendEvent(new MultiplayerEvent(SELL_HOUSE, location));
+    }
+
 
     @Override
     public void communityChest() {
@@ -192,15 +217,15 @@ public class MultiplayerGame extends Game {
         }
 
         private void rollDice() {
-            int die1Val = mpEvent.getDie1();
-            int die2Val = mpEvent.getDie2();
-            die1.setTexture(die1Val);
-            die2.setTexture(die2Val);
-            die1.setVisible(true);
-            die2.setVisible(true);
+            int dieLeftVal = mpEvent.getDieLeft();
+            int dieRightVal = mpEvent.getDieRight();
+            dieLeft.setTexture(dieLeftVal);
+            dieRight.setTexture(dieRightVal);
+            dieLeft.setVisible(true);
+            dieRight.setVisible(true);
 
-            diceRoll = die1Val + die2Val + 2;
-            currentPlayer.updateLocation(diceRoll);
+            diceTotal = dieLeftVal + dieRightVal + 2;
+            currentPlayer.updateLocation(diceTotal);
             timedEvent = NONE;
         }
 

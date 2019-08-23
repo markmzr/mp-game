@@ -132,8 +132,8 @@ public class Player {
         moneyDelta.updateText(text);
     }
 
-    public void updateLocation(int diceRoll) {
-        newLocation = currentLocation + diceRoll;
+    public void updateLocation(int diceTotal) {
+        newLocation = currentLocation + diceTotal;
         newLocation = newLocation >= 40 ? newLocation - 40 : newLocation;
         moving = true;
         deltaTime = 0;

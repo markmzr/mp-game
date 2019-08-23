@@ -52,7 +52,7 @@ public class GameScreen implements Screen {
     @Override
     public void buttonPressed(ScreenState screenState, double xCursor, double yCursor) {
         game.buttonPressed(xCursor, yCursor);
-        if (!game.getPrompt().isEnabled()) {
+        if (!game.getPrompt().isVisible()) {
             if (rollDice.isMouseover(xCursor, yCursor)) {
                 rollDice.setButtonState(DISABLED);
                 game.rollDice();

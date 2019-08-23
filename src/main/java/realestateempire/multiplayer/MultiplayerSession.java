@@ -86,7 +86,7 @@ public class MultiplayerSession extends StompSessionHandlerAdapter {
             WebSocketClient client = new StandardWebSocketClient();
             WebSocketStompClient stompClient = new WebSocketStompClient(client);
             stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-            stompClient.connect("ws://murmuring-savannah-38102.herokuapp.com/real-estate-empire", this);
+            stompClient.connect("ws://mp-game-app.herokuapp.com/real-estate-empire", this);
         }
     }
 

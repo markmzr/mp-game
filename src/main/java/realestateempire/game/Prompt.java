@@ -21,7 +21,7 @@ public class Prompt {
     private final QuitMenu quitMenu;
     private final PlayerDisconnect playerDisconnect;
     private GamePrompt gamePrompt;
-    private boolean enabled;
+    private boolean visible;
 
     Prompt(Game game) {
         this.game = game;
@@ -33,27 +33,27 @@ public class Prompt {
         quitMenu = new QuitMenu();
         playerDisconnect = new PlayerDisconnect();
         gamePrompt = buyProperty;
-        enabled = false;
+        visible = false;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isVisible() {
+        return visible;
     }
 
     public void render() {
-        if (enabled) {
+        if (visible) {
             gamePrompt.render();
         }
     }
 
     public void cursorMoved(double xCursor, double yCursor) {
-        if (enabled) {
+        if (visible) {
             gamePrompt.cursorMoved(xCursor, yCursor);
         }
     }
 
     public void buttonPressed(double xCursor, double yCursor) {
-        if (enabled) {
+        if (visible) {
             gamePrompt.buttonPressed(xCursor, yCursor);
         }
     }
@@ -64,40 +64,40 @@ public class Prompt {
         viewProperty.sellHouse.setButtonState(property.canSellHouse());
         viewProperty.property = property;
         gamePrompt = viewProperty;
-        enabled = true;
+        visible = true;
     }
 
     void setBuyProperty() {
         gamePrompt = buyProperty;
-        enabled = true;
+        visible = true;
     }
 
     public void setCommunityChest(int card) {
         communityChest.background.setTexture(card);
         gamePrompt = communityChest;
-        enabled = true;
+        visible = true;
     }
 
     public void setChance(int card) {
         chance.background.setTexture(card);
         gamePrompt = chance;
-        enabled = true;
+        visible = true;
     }
 
     public void setInJail() {
         gamePrompt = inJail;
-        enabled = true;
+        visible = true;
     }
 
     public void setQuitMenu(ScreenState screenState) {
         quitMenu.screenState = screenState;
         gamePrompt = quitMenu;
-        enabled = true;
+        visible = true;
     }
 
     public void setPlayerDisconnect() {
         gamePrompt = playerDisconnect;
-        enabled = true;
+        visible = true;
     }
 
     private abstract class GamePrompt {
@@ -156,22 +156,22 @@ public class Prompt {
             if (close.isMouseover(xCursor, yCursor)) {
                 property.getButton().setButtonState(ENABLED);
                 close.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
             }
             if (sellProperty.isMouseover(xCursor, yCursor)) {
-                property.sellProperty();
+                game.sellProperty();
                 sellProperty.setButtonState(DISABLED);
                 buyHouse.setButtonState(DISABLED);
                 sellHouse.setButtonState(DISABLED);
             }
             if (buyHouse.isMouseover(xCursor, yCursor)) {
-                property.buyHouse();
+                game.buyHouse();
                 sellProperty.setButtonState(DISABLED);
                 buyHouse.setButtonState(property.canBuyHouse());
                 sellHouse.setButtonState(ENABLED);
             }
             if (sellHouse.isMouseover(xCursor, yCursor)) {
-                property.sellHouse();
+                game.sellHouse();
                 sellProperty.setButtonState(property.canSellProperty());
                 buyHouse.setButtonState(property.canBuyHouse());
                 sellHouse.setButtonState(property.canSellHouse());
@@ -211,12 +211,12 @@ public class Prompt {
         public void buttonPressed(double xCursor, double yCursor) {
             if (yes.isMouseover(xCursor, yCursor)) {
                 yes.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
                 game.buyProperty();
             }
             if (no.isMouseover(xCursor, yCursor)) {
                 no.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
                 game.turnCompleted();
             }
         }
@@ -252,7 +252,7 @@ public class Prompt {
         void buttonPressed(double xCursor, double yCursor) {
             if (ok.isMouseover(xCursor, yCursor)) {
                 ok.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
             }
         }
     }
@@ -287,7 +287,7 @@ public class Prompt {
         void buttonPressed(double xCursor, double yCursor) {
             if (ok.isMouseover(xCursor, yCursor)) {
                 ok.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
             }
         }
     }
@@ -318,7 +318,7 @@ public class Prompt {
         void buttonPressed(double xCursor, double yCursor) {
             if (payFine.isMouseover(xCursor, yCursor)) {
                 payFine.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
                 game.payJailFine();
             }
         }
@@ -396,7 +396,7 @@ public class Prompt {
         void buttonPressed(double xCursor, double yCursor) {
             if (mainMenu.isMouseover(xCursor, yCursor)) {
                 mainMenu.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
                 screenState.setToMenuScreen();
                 if (game instanceof MultiplayerGame) {
                     MultiplayerEvent mpEvent = new MultiplayerEvent(PLAYER_DISCONNECT);
@@ -408,7 +408,7 @@ public class Prompt {
             }
             if (cancel.isMouseover(xCursor, yCursor)) {
                 cancel.setButtonState(ENABLED);
-                enabled = false;
+                visible = false;
             }
         }
     }

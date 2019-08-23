@@ -28,28 +28,28 @@ public class Property implements Location {
     private boolean owned;
     private boolean hotelBuilt;
 
-    Property(Game game, String[] data) {
+    Property(Game game, String[] propertyData) {
         this.game = game;
-        location = Integer.parseInt(data[0]);
-        price = Integer.parseInt(data[1]);
-        rent = Integer.parseInt(data[2]);
-        propertyType = PropertyType.valueOf(data[3]);
+        location = Integer.parseInt(propertyData[0]);
+        price = Integer.parseInt(propertyData[1]);
+        rent = Integer.parseInt(propertyData[2]);
+        propertyType = PropertyType.valueOf(propertyData[3]);
 
-        int xOwnerIcon = Integer.parseInt(data[4]);
-        int yOwnerIcon = Integer.parseInt(data[5]);
+        int xOwnerIcon = Integer.parseInt(propertyData[4]);
+        int yOwnerIcon = Integer.parseInt(propertyData[5]);
         ownerToken = new Model("Tokens/Blank Token Small.png", xOwnerIcon, yOwnerIcon, false);
 
-        String[] propertyTextures = { data[6], data[7] };
-        int xProperty = Integer.parseInt(data[8]);
-        int yProperty = Integer.parseInt(data[9]);
+        String[] propertyTextures = { propertyData[6], propertyData[7] };
+        int xProperty = Integer.parseInt(propertyData[8]);
+        int yProperty = Integer.parseInt(propertyData[9]);
         property = new Button(propertyTextures, xProperty, yProperty);
 
-        int xHotel = Integer.parseInt(data[11]);
-        int yHotel = Integer.parseInt(data[12]);
-        hotel = new Model(data[10], xHotel, yHotel, false);
+        int xHotel = Integer.parseInt(propertyData[11]);
+        int yHotel = Integer.parseInt(propertyData[12]);
+        hotel = new Model(propertyData[10], xHotel, yHotel, false);
 
-        int xHouse = Integer.parseInt(data[14]);
-        int yHouse = Integer.parseInt(data[15]);
+        int xHouse = Integer.parseInt(propertyData[14]);
+        int yHouse = Integer.parseInt(propertyData[15]);
         houses = initHouses(xHouse, yHouse);
     }
 
@@ -83,7 +83,7 @@ public class Property implements Location {
     }
 
     public void cursorMoved(double xCursor, double yCursor) {
-        if (!game.getPrompt().isEnabled()) {
+        if (!game.getPrompt().isVisible()) {
             property.isMouseover(xCursor, yCursor);
         }
     }
@@ -179,9 +179,9 @@ public class Property implements Location {
                 rentTotal = 200;
             }
         } else {
-            int diceRoll = game.getDiceRoll();
+            int diceTotal = game.getDiceTotal();
             int multiplier = owner.getUtilitiesOwned() == 1 ? 4 : 10;
-            rentTotal = diceRoll * multiplier;
+            rentTotal = diceTotal * multiplier;
         }
         game.getCurrentPlayer().updateMoney(-1 * rentTotal);
         owner.updateMoney(rentTotal);

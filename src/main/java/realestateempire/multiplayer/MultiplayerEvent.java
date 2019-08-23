@@ -9,8 +9,8 @@ public class MultiplayerEvent {
     }
 
     private GameEvent gameEvent;
-    private int die1;
-    private int die2;
+    private int dieLeft;
+    private int dieRight;
     private int propertyLocation;
     private int eventCard;
 
@@ -32,22 +32,22 @@ public class MultiplayerEvent {
         }
     }
 
-    public MultiplayerEvent(GameEvent gameEvent, int die1, int die2) {
+    public MultiplayerEvent(GameEvent gameEvent, int dieLeft, int dieRight) {
         this.gameEvent = gameEvent;
-        this.die1 = die1;
-        this.die2 = die2;
+        this.dieLeft = dieLeft;
+        this.dieRight = dieRight;
     }
 
     public GameEvent getGameEvent() {
         return gameEvent;
     }
 
-    public int getDie1() {
-        return die1;
+    public int getDieLeft() {
+        return dieLeft;
     }
 
-    public int getDie2() {
-        return die2;
+    public int getDieRight() {
+        return dieRight;
     }
 
     public int getPropertyLocation() {

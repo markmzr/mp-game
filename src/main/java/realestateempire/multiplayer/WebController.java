@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
-import org.springframework.messaging.simp.annotation.*;
 
 import static realestateempire.multiplayer.MultiplayerEvent.GameEvent.PLAYER_DISCONNECT;
 
@@ -57,7 +56,7 @@ public class WebController {
     }
 
     @EventListener(SessionUnsubscribeEvent.class)
-    public void handleUnsubscribeEvent(SessionSubscribeEvent event) {
+    public void handleUnsubscribeEvent(SessionUnsubscribeEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = accessor.getDestination();
         if (destination.equals("/topic/find-game")) {

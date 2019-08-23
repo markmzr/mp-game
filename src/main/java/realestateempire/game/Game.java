@@ -24,15 +24,15 @@ public class Game {
     protected final GameScreen gameScreen;
     protected final Prompt prompt;
     protected final Board board;
-    protected final Model die1;
-    protected final Model die2;
+    protected final Model dieLeft;
+    protected final Model dieRight;
     protected final Model playerBorder;
     protected final Model gameOver;
     protected final Player[] players;
     protected Player currentPlayer;
     protected TimedEvent timedEvent;
     protected int playerTurn;
-    protected int diceRoll;
+    protected int diceTotal;
     protected double eventTime;
 
     public Game(GameScreen gameScreen) {
@@ -43,8 +43,8 @@ public class Game {
         for (int i = 0; i < 6; i++) {
             dieTextures[i] = "Dice/Dice " + (i + 1) + ".png";
         }
-        die1 = new Model(dieTextures, 657, 846);
-        die2 = new Model(dieTextures, 732, 846);
+        dieLeft = new Model(dieTextures, 657, 846);
+        dieRight = new Model(dieTextures, 732, 846);
         playerBorder = new Model("Player/Player Border.png", 1481, 41);
 
         String[] gameOverTextures = { "Prompts/Win.png", "Prompts/Lose.png" };
@@ -53,7 +53,7 @@ public class Game {
         players = new Player[4];
         currentPlayer = players[0];
         timedEvent = NONE;
-        diceRoll = 0;
+        diceTotal = 0;
         playerTurn = 0;
         eventTime = 0;
     }
@@ -94,8 +94,8 @@ public class Game {
         return currentPlayer;
     }
 
-    int getDiceRoll() {
-        return diceRoll;
+    int getDiceTotal() {
+        return diceTotal;
     }
 
     public void render() {
@@ -110,8 +110,8 @@ public class Game {
         }
         currentPlayer.render();
         board.render();
-        die1.render();
-        die2.render();
+        dieLeft.render();
+        dieRight.render();
         playerBorder.render();
         prompt.render();
         gameOver.render();
@@ -123,7 +123,7 @@ public class Game {
     }
 
     public void buttonPressed(double xCursor, double yCursor) {
-        if (prompt.isEnabled()) {
+        if (prompt.isVisible()) {
             prompt.buttonPressed(xCursor, yCursor);
         } else {
             board.buttonPressed(xCursor, yCursor);
@@ -153,23 +153,23 @@ public class Game {
                 }
                 timedEvent = ROLL_DICE;
                 eventTime = glfwGetTime() + 2;
-                die1.setVisible(false);
-                die2.setVisible(false);
+                dieLeft.setVisible(false);
+                dieRight.setVisible(false);
             }
         }
     }
 
     public void rollDice() {
         Random random = new Random();
-        int die1Val = random.nextInt(6);
-        int die2Val = random.nextInt(6);
-        die1.setTexture(die1Val);
-        die2.setTexture(die2Val);
-        die1.setVisible(true);
-        die2.setVisible(true);
+        int dieLeftVal = random.nextInt(6);
+        int dieRightVal = random.nextInt(6);
+        dieLeft.setTexture(dieLeftVal);
+        dieRight.setTexture(dieRightVal);
+        dieLeft.setVisible(true);
+        dieRight.setVisible(true);
 
-        diceRoll = die1Val + die2Val + 2;
-        currentPlayer.updateLocation(diceRoll);
+        diceTotal = dieLeftVal + dieRightVal + 2;
+        currentPlayer.updateLocation(diceTotal);
         timedEvent = NONE;
     }
 
@@ -193,6 +193,24 @@ public class Game {
         int location = currentPlayer.getCurrentLocation();
         Property property = (Property) board.getLocation(location);
         property.buyProperty();
+    }
+
+    public void sellProperty() {
+        int location = currentPlayer.getCurrentLocation();
+        Property property = (Property) board.getLocation(location);
+        property.sellProperty();
+    }
+
+    public void buyHouse() {
+        int location = currentPlayer.getCurrentLocation();
+        Property property = (Property) board.getLocation(location);
+        property.buyHouse();
+    }
+
+    public void sellHouse() {
+        int location = currentPlayer.getCurrentLocation();
+        Property property = (Property) board.getLocation(location);
+        property.sellHouse();
     }
 
     public void communityChest() {
