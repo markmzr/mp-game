@@ -100,6 +100,10 @@ public class Prompt {
         visible = true;
     }
 
+    public GamePrompt getGamePrompt() {
+        return gamePrompt;
+    }
+
     private abstract class GamePrompt {
 
         abstract void render();

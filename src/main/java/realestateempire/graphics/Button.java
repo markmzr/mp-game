@@ -36,6 +36,9 @@ public class Button extends Model {
     }
 
     public boolean isMouseover(double xCursor, double yCursor) {
+        if (buttonState == DISABLED) {
+            return false;
+        }
         if (xCursor >= xLeft && xCursor <= xRight
                 && yCursor >= yTop && yCursor <= yBottom) {
             if (buttonState == ENABLED) {

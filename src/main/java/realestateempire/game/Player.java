@@ -50,8 +50,8 @@ public class Player {
 
         playerState = ACTIVE;
         money = 1500;
-        moneyDelta = new Text("+$0", 1900, 82 + yDelta);
-        moneyText = new Text("$" + money, 2243, 82 + yDelta);
+        moneyDelta = new Text("+$0", 1900, 82 + yDelta, 1);
+        moneyText = new Text("$" + money, 2243, 82 + yDelta, 1);
         currentLocation = 0;
         newLocation = 0;
         railroadsOwned = 0;

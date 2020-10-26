@@ -26,9 +26,18 @@ public class Model {
         visible = true;
     }
 
-    public Model(String textureFiles, int x, int y, boolean visible) {
-        this(textureFiles, x, y);
-        this.visible = visible;
+    public Model(String textureFiles, int x, int y, double scale) {
+        this.x = x;
+        this.y = y;
+        textures = new Texture[1];
+        textures[0] = new Texture(textureFiles);
+        int scaledWidth = (int)(getWidth() * scale);
+        int scaledHeight = (int)(getHeight() * scale);
+        vertexSet = new VertexSet(x, y, scaledWidth, scaledHeight);
+        shader = new Shader();
+        position = new Matrix4f().ortho2D(-1, 1, -1, 1);
+        texture = 0;
+        visible = true;
     }
 
     public Model(String[] textureFiles, int x, int y) {
@@ -43,6 +52,11 @@ public class Model {
         position = new Matrix4f().ortho2D(-1, 1, -1, 1);
         texture = 0;
         visible = true;
+    }
+
+    public Model(String textureFiles, int x, int y, boolean visible) {
+        this(textureFiles, x, y);
+        this.visible = visible;
     }
 
     public void setTexture(int texture) {
@@ -76,6 +90,14 @@ public class Model {
 
     public Matrix4f getPosition() {
         return position;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     int getWidth() {

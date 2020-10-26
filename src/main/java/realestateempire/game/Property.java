@@ -11,7 +11,13 @@ public class Property implements Location {
 
     public enum PropertyType {
 
-        STREET, RAILROAD, UTILITY
+        STREET("Ave"), RAILROAD("Ave Railroad"), UTILITY ("Ave");
+
+        private final String label;
+
+        PropertyType(String label) {
+            this.label = label;
+        }
     }
 
     private final Game game;
@@ -61,6 +67,10 @@ public class Property implements Location {
         return location;
     }
 
+    int getPrice() {
+        return price;
+    }
+
     Player getOwner() {
         return owner;
     }
@@ -90,8 +100,12 @@ public class Property implements Location {
 
     public void buttonPressed(double xCursor, double yCursor) {
         if (property.isMouseover(xCursor, yCursor)) {
-            property.setButtonState(MOUSEOVER);
-            game.getPrompt().setViewProperty(this);
+            if (game.getTrade().isVisible() && houseCount == 0 && !hotelBuilt) {
+                game.getTrade().addProperty(this);
+            } else {
+                property.setButtonState(MOUSEOVER);
+                game.getPrompt().setViewProperty(this);
+            }
         }
     }
 
@@ -209,6 +223,23 @@ public class Property implements Location {
         owner.updateMoney(50);
     }
 
+    public void setOwner(Player player) {
+        if (propertyType == RAILROAD) {
+            owner.setRailroadsOwned(owner.getRailroadsOwned() - 1);
+        } else if (propertyType == UTILITY) {
+            owner.setUtilitiesOwned(owner.getUtilitiesOwned() - 1);
+        }
+        owned = true;
+        owner = player;
+        ownerToken.setTextures(0, owner.getToken().getTexture());
+        ownerToken.setVisible(true);
+        if (propertyType == RAILROAD) {
+            owner.setRailroadsOwned(owner.getRailroadsOwned() + 1);
+        } else if (propertyType == UTILITY) {
+            owner.setUtilitiesOwned(owner.getUtilitiesOwned() + 1);
+        }
+    }
+
     private Model[] initHouses(int x, int y) {
         Model[] houses = new Model[4];
         if (location < 10) {
@@ -229,5 +260,17 @@ public class Property implements Location {
             }
         }
         return houses;
+    }
+
+    public String toString() {
+        String name;
+        if (location == 12) {
+            name = "Electric Company";
+        } else if (location == 28) {
+            name = "Water Company";
+        } else {
+            name = location + " " + propertyType.label;
+        }
+        return name;
     }
 }

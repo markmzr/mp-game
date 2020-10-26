@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 import realestateempire.game.Player.PlayerState;
+import realestateempire.graphics.Button;
 import realestateempire.graphics.Model;
 import realestateempire.screens.GameScreen;
 
@@ -28,7 +29,9 @@ public class Game {
     protected final Model dieRight;
     protected final Model playerBorder;
     protected final Model gameOver;
+    protected final Button[] tradeAi;
     protected final Player[] players;
+    protected final Trade trade;
     protected Player currentPlayer;
     protected TimedEvent timedEvent;
     protected int playerTurn;
@@ -56,15 +59,22 @@ public class Game {
         diceTotal = 0;
         playerTurn = 0;
         eventTime = 0;
+
+        String[] tradeAiTextures = { "Buttons/Trade Player.png", "Buttons/Trade Player M.png" };
+        tradeAi = new Button[3];
+        for (int i = 0; i < 3; i++) {
+            tradeAi[i] = new Button(tradeAiTextures, 1481, 206 + (165 * i));
+        }
+        trade = new Trade(this);
     }
 
     public Game(GameScreen gameScreen, int userToken) {
         this(gameScreen);
         ArrayList<String[]> textures = new ArrayList<>();
         textures.add(new String[] { "Tokens/Hat.png", "Tokens/Hat Small.png" });
-        textures.add(new String[] { "Tokens/Red Token.png", "Tokens/Red Token Small.png"});
-        textures.add(new String[] { "Tokens/Blue Token.png", "Tokens/Blue Token Small.png"});
-        textures.add(new String[] { "Tokens/Green Token.png", "Tokens/Blue Token Small.png"});
+        textures.add(new String[] { "Tokens/Red Token.png", "Tokens/Red Token Small.png" });
+        textures.add(new String[] { "Tokens/Blue Token.png", "Tokens/Blue Token Small.png" });
+        textures.add(new String[] { "Tokens/Green Token.png", "Tokens/Blue Token Small.png" });
 
         players[0] = new Player(this, true, 0, "Player/Player.png", textures.get(userToken));
         textures.remove(userToken);
@@ -90,6 +100,10 @@ public class Game {
         return players[0];
     }
 
+    Trade getTrade() {
+        return trade;
+    }
+
     Player getCurrentPlayer() {
         return currentPlayer;
     }
@@ -108,11 +122,15 @@ public class Game {
         for (Player player : players) {
             player.render();
         }
+        for (Button tradeAi : tradeAi) {
+            tradeAi.render();
+        }
         currentPlayer.render();
         board.render();
         dieLeft.render();
         dieRight.render();
         playerBorder.render();
+        trade.render();
         prompt.render();
         gameOver.render();
     }
@@ -120,6 +138,10 @@ public class Game {
     public void cursorMoved(double xCursor, double yCursor) {
         prompt.cursorMoved(xCursor, yCursor);
         board.cursorMoved(xCursor, yCursor);
+        trade.cursorMoved(xCursor, yCursor);
+        for (Button tradeAi : tradeAi) {
+            tradeAi.isMouseover(xCursor, yCursor);
+        }
     }
 
     public void buttonPressed(double xCursor, double yCursor) {
@@ -127,6 +149,30 @@ public class Game {
             prompt.buttonPressed(xCursor, yCursor);
         } else {
             board.buttonPressed(xCursor, yCursor);
+        }
+        if (trade.isVisible()) {
+            trade.buttonPressed(xCursor, yCursor);
+        }
+        if (tradeAi[0].isMouseover(xCursor, yCursor)) {
+            trade.setPlayer1(players[0]);
+            trade.setPlayer1Name("Player");
+            trade.setPlayer2(players[1]);
+            trade.setPlayer2Name("AI 1");
+            trade.setVisible(true);
+        }
+        if (tradeAi[1].isMouseover(xCursor, yCursor)) {
+            trade.setPlayer1(players[0]);
+            trade.setPlayer1Name("Player");
+            trade.setPlayer2(players[2]);
+            trade.setPlayer2Name("AI 2");
+            trade.setVisible(true);
+        }
+        if (tradeAi[2].isMouseover(xCursor, yCursor)) {
+            trade.setPlayer1(players[0]);
+            trade.setPlayer1Name("Player");
+            trade.setPlayer2(players[3]);
+            trade.setPlayer2Name("AI 3");
+            trade.setVisible(true);
         }
     }
 
