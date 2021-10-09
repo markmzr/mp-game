@@ -1,88 +1,121 @@
 package realestateempire.screens;
 
-import realestateempire.game.Game;
-import realestateempire.graphics.Button;
-import realestateempire.graphics.Button.ButtonState;
-import realestateempire.graphics.Model;
-import realestateempire.multiplayer.MultiplayerGame;
-import realestateempire.multiplayer.MultiplayerSession;
+import java.util.ArrayList;
 
-import static realestateempire.graphics.Button.ButtonState.DISABLED;
+import realestateempire.graphics.Graphic;
+import realestateempire.graphics.Interactive;
+import realestateempire.graphics.button.Button;
+import realestateempire.graphics.button.ButtonAction;
+import realestateempire.graphics.model.Model;
+import realestateempire.multiplayer.MultiplayerGame.MultiplayerGameBuilder;
+import realestateempire.multiplayer.MultiplayerQuitMenu;
+import realestateempire.multiplayer.server.GameSession;
+import realestateempire.singleplayer.Game;
+import realestateempire.singleplayer.Game.GameBuilderGraphics;
+import realestateempire.singleplayer.GameGraphics;
+import realestateempire.singleplayer.QuitMenu;
+import realestateempire.singleplayer.SingleplayerGame.SingleplayerGameBuilder;
+import realestateempire.singleplayer.player.Token;
 
 public class GameScreen implements Screen {
 
     private final Model background;
-    private final Button rollDice;
-    private final Button endTurn;
     private final Button quit;
+    private final ButtonAction selectMainMenu;
+    private final ButtonAction quitGame;
+    private final ArrayList<Graphic> graphics;
+    private final ArrayList<Interactive>[] interactives;
     private Game game;
 
-    GameScreen() {
+    GameScreen(ButtonAction selectMainMenu, ButtonAction quitGame) {
+        this.selectMainMenu = selectMainMenu;
+        this.quitGame = quitGame;
         background = new Model("Background.png", 0, 0);
-        String[] rollDiceTextures = { "Buttons/Roll Dice.png",
-                "Buttons/Roll Dice M.png", "Buttons/Roll Dice D.png" };
-        rollDice = new Button(rollDiceTextures, 1491, 1303);
-
-        String[] endTurnTextures = { "Buttons/End Turn.png",
-                "Buttons/End Turn M.png", "Buttons/End Turn D.png" };
-        endTurn = new Button(endTurnTextures, 1847, 1303);
-        endTurn.setButtonState(DISABLED);
-
-        String[] quitTextures = { "Buttons/Quit.png", "Buttons/Quit M.png" };
+        String[] quitTextures = { "Buttons/Quit.png", "Buttons/Quit M.png",
+                "Buttons/Quit.png" };
         quit = new Button(quitTextures, 2203, 1303);
+        graphics = new ArrayList<>();
+        interactives = new ArrayList[5];
+        for (int i = 0; i < interactives.length; i++) {
+            interactives[i] = new ArrayList<>();
+        }
     }
 
     @Override
     public void render() {
         background.render();
-        rollDice.render();
-        endTurn.render();
-        quit.render();
         game.render();
+        quit.render();
+        for (Graphic graphic : graphics) {
+            graphic.render();
+        }
+        for (ArrayList<Interactive> interactiveList : interactives) {
+            for (Interactive interactive : interactiveList) {
+                interactive.render();
+            }
+        }
     }
 
     @Override
     public void cursorMoved(double xCursor, double yCursor) {
-        game.cursorMoved(xCursor, yCursor);
-        rollDice.isMouseover(xCursor, yCursor);
-        endTurn.isMouseover(xCursor, yCursor);
-        quit.isMouseover(xCursor, yCursor);
+        quit.cursorMoved(xCursor, yCursor);
+        for (ArrayList<Interactive> interactiveList : interactives) {
+            for (Interactive interactive : interactiveList) {
+                interactive.cursorMoved(xCursor, yCursor);
+            }
+        }
     }
 
     @Override
-    public void buttonPressed(ScreenState screenState, double xCursor, double yCursor) {
-        game.buttonPressed(xCursor, yCursor);
-        if (rollDice.isMouseover(xCursor, yCursor)) {
-            rollDice.setButtonState(DISABLED);
-            game.rollDice();
-        }
-        if (endTurn.isMouseover(xCursor, yCursor)) {
-            endTurn.setButtonState(DISABLED);
-            game.setNextTurn();
-        }
-        if (quit.isMouseover(xCursor, yCursor)) {
-            game.getPrompt().setQuitMenu(screenState);
+    public void buttonPressed(double xCursor, double yCursor) {
+        quit.buttonPressed(xCursor, yCursor);
+        for (int i = interactives.length - 1; i >= 0; i--) {
+            for (int j = 0; j < interactives[i].size(); j++) {
+                if (interactives[i].get(j).buttonPressed(xCursor, yCursor)) {
+                    return;
+                }
+            }
         }
     }
 
-    public void setRollDiceState(ButtonState buttonState) {
-        rollDice.setButtonState(buttonState);
+    void initSingleplayerGame(Token userToken) {
+        clearGraphics();
+        GameGraphics gameGraphics = new GameGraphics(interactives);
+        GameBuilderGraphics gameBuilderGraphics = new GameBuilderGraphics(gameGraphics);
+        game = new SingleplayerGameBuilder(userToken, gameBuilderGraphics, this).build();
+        QuitMenu quitMenu = new QuitMenu(selectMainMenu, quitGame);
+        addQuitAction(quitMenu);
+        interactives[0].add(gameBuilderGraphics);
+        interactives[4].add(quitMenu);
     }
 
-    public void setEndTurnState(ButtonState buttonState) {
-        endTurn.setButtonState(buttonState);
+    void initMultiplayerGame(GameSession gameSession) {
+        clearGraphics();
+        GameGraphics gameGraphics = new GameGraphics(interactives);
+        GameBuilderGraphics gameBuilderGraphics = new GameBuilderGraphics(gameGraphics);
+        game = new MultiplayerGameBuilder(gameBuilderGraphics, this, gameSession).build();
+        QuitMenu quitMenu = new MultiplayerQuitMenu(selectMainMenu, quitGame, gameSession);
+        addQuitAction(quitMenu);
+        interactives[0].add(gameBuilderGraphics);
+        interactives[4].add(quitMenu);
     }
 
-    void initSingleplayerGame(int userToken) {
-        game = new Game(this, userToken);
+    public void add(Interactive interactive) {
+        interactives[0].add(interactive);
     }
 
-    void initMultiplayerGame(MultiplayerSession mpSession) {
-        game = new MultiplayerGame(this, mpSession);
-        mpSession.setMultiplayerGame((MultiplayerGame) game);
-        if (mpSession.getUserId() != 0) {
-            rollDice.setButtonState(DISABLED);
-            endTurn.setButtonState(DISABLED);
+    public void add(Interactive interactive, int index) {
+        interactives[index].add(interactive);
+    }
+
+    private void clearGraphics() {
+        graphics.clear();
+        for (ArrayList<Interactive> interactiveList : interactives) {
+            interactiveList.clear();
         }
+    }
+
+    private void addQuitAction(QuitMenu quitMenu) {
+        quit.addAction(() -> quitMenu.setEnabled(true));
     }
 }

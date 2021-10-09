@@ -1,32 +1,36 @@
 package realestateempire;
 
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
+import org.lwjgl.opengl.GL;
 
 import realestateempire.screens.ScreenState;
 
-import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
-import static org.lwjgl.system.MemoryStack.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Main {
 
+    private final GLFWFramebufferSizeCallback resizeWindow;
+    private final GLFWCursorPosCallback cursorPos;
+    private final GLFWMouseButtonCallback mouseButton;
     private static long window;
     private ScreenState screenState;
 
-    public static long getWindow() {
-        return window;
+    public Main() {
+        resizeWindow = initResizeWindow();
+        cursorPos = initCursorPosCallback();
+        mouseButton = initMouseButtonCallback();
     }
 
-    private void run() {
+    public void run() {
         init();
         loop();
         glfwFreeCallbacks(window);
@@ -42,36 +46,34 @@ public class Main {
         }
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        initWindow();
+        initCursor(window);
+        GL.createCapabilities();
+        screenState = new ScreenState(window);
+    }
 
+    private void initWindow() {
         GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         int resolutionWidth = vidMode.width();
         int resolutionHeight = vidMode.height();
-        window = glfwCreateWindow(
-                (int)(resolutionWidth * 0.6),
-                (int)(resolutionHeight * 0.6),
-                "Real Estate Empire", NULL, NULL);
+        window = glfwCreateWindow((int)(resolutionWidth * 0.6),
+                (int)(resolutionHeight * 0.6), "Real Estate Empire", NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create GLFW window");
         }
         glfwSetWindowAspectRatio(window, resolutionWidth, resolutionHeight);
-
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
-            glfwGetWindowSize(window, pWidth, pHeight);
-            glfwSetWindowPos(
-                    window,
-                    (resolutionWidth - pWidth.get(0)) / 2,
-                    (resolutionHeight - pHeight.get(0)) / 2);
-        }
+        glfwSetWindowPos(window, (int)(resolutionWidth * 0.2),
+                (int)(resolutionHeight * 0.2));
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
         glfwShowWindow(window);
 
         glfwSetFramebufferSizeCallback(window, resizeWindow);
-        glfwSetCursorPosCallback(window, cursorPosCallback);
-        glfwSetMouseButtonCallback(window, mouseButtonCallback);
+        glfwSetCursorPosCallback(window, cursorPos);
+        glfwSetMouseButtonCallback(window, mouseButton);
+    }
 
+    private void initCursor(long window) {
         IntBuffer x = BufferUtils.createIntBuffer(1);
         IntBuffer y = BufferUtils.createIntBuffer(1);
         IntBuffer channels = BufferUtils.createIntBuffer(1);
@@ -84,13 +86,11 @@ public class Main {
         long cursorId = glfwCreateCursor(cursor, 0, 0);
         glfwSetCursor(window, cursorId);
         stbi_image_free(cursorData);
-
-        GL.createCapabilities();
-        screenState = new ScreenState(window);
     }
 
     private void loop() {
         while (!glfwWindowShouldClose(window)) {
+            glfwMakeContextCurrent(window);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             screenState.render();
             glfwSwapBuffers(window);
@@ -102,43 +102,49 @@ public class Main {
         new Main().run();
     }
 
-    private GLFWFramebufferSizeCallback resizeWindow = new GLFWFramebufferSizeCallback(){
-        @Override
-        public void invoke(long window, int width, int height){
-            glfwSetWindowSize(window, width, height);
-            glViewport(0,0, width, height);
-        }
-    };
-
-    private GLFWCursorPosCallback cursorPosCallback = new GLFWCursorPosCallback() {
-        @Override
-        public void invoke(long window, double xCursorPos, double yCursorPos) {
-            int[] windowWidth = new int[1];
-            int[] windowHeight = new int[1];
-            glfwGetWindowSize(window, windowWidth, windowHeight);
-
-            double xCursor = xCursorPos / windowWidth[0];
-            double yCursor = yCursorPos / windowHeight[0];
-            screenState.cursorMoved(xCursor, yCursor);
-        }
-    };
-
-    private GLFWMouseButtonCallback mouseButtonCallback = new GLFWMouseButtonCallback() {
-        @Override
-        public void invoke(long window, int button, int action, int mods) {
-            double[] xCursorPos = new double[1];
-            double[] yCursorPos = new double[1];
-            glfwGetCursorPos(window, xCursorPos, yCursorPos);
-
-            int[] windowWidth = new int[1];
-            int[] windowHeight = new int[1];
-            glfwGetWindowSize(window, windowWidth, windowHeight);
-
-            double xCursor = xCursorPos[0] / windowWidth[0];
-            double yCursor = yCursorPos[0] / windowHeight[0];
-            if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
-                screenState.buttonPressed(xCursor, yCursor);
+    private GLFWFramebufferSizeCallback initResizeWindow() {
+        return new GLFWFramebufferSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                glfwSetWindowSize(window, width, height);
+                glViewport(0, 0, width, height);
             }
-        }
-    };
+        };
+    }
+
+    private GLFWCursorPosCallback initCursorPosCallback() {
+        return new GLFWCursorPosCallback() {
+            @Override
+            public void invoke(long window, double xCursorPos, double yCursorPos) {
+                int[] windowWidth = new int[1];
+                int[] windowHeight = new int[1];
+                glfwGetWindowSize(window, windowWidth, windowHeight);
+
+                double xCursor = xCursorPos / windowWidth[0];
+                double yCursor = yCursorPos / windowHeight[0];
+                screenState.cursorMoved(xCursor, yCursor);
+            }
+        };
+    }
+
+    private GLFWMouseButtonCallback initMouseButtonCallback() {
+        return new GLFWMouseButtonCallback() {
+            @Override
+            public void invoke(long window, int button, int action, int mods) {
+                double[] xCursorPos = new double[1];
+                double[] yCursorPos = new double[1];
+                glfwGetCursorPos(window, xCursorPos, yCursorPos);
+
+                int[] windowWidth = new int[1];
+                int[] windowHeight = new int[1];
+                glfwGetWindowSize(window, windowWidth, windowHeight);
+
+                double xCursor = xCursorPos[0] / windowWidth[0];
+                double yCursor = yCursorPos[0] / windowHeight[0];
+                if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
+                    screenState.buttonPressed(xCursor, yCursor);
+                }
+            }
+        };
+    }
 }

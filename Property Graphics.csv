@@ -1,0 +1,29 @@
+location,owner icon x,owner icon y,mortgage texture,mortgage x,mortgage y
+1,1168,1208,Property Mortgage.png,1132,1249
+3,934,1208,Property Mortgage.png,898,1249
+5,700,1208,Property Mortgage.png,665,1249
+6,583,1208,Property Mortgage.png,547,1249
+8,349,1208,Property Mortgage.png,313,1249
+9,232,1208,Property Mortgage.png,196,1249
+11,206,1175,Property Mortgage Side.png,5,1132
+12,206,1058,Property Mortgage Side.png,5,1015
+13,206,941,Property Mortgage Side.png,5,898
+14,206,824,Property Mortgage Side.png,5,781
+15,206,707,Property Mortgage Side.png,5,665
+16,206,590,Property Mortgage Side.png,5,547
+18,206,356,Property Mortgage Side.png,5,313
+19,206,239,Property Mortgage Side.png,5,196
+21,232,206,Property Mortgage.png,196,5
+23,466,206,Property Mortgage.png,430,5
+24,583,206,Property Mortgage.png,547,5
+25,700,206,Property Mortgage.png,664,5
+26,817,206,Property Mortgage.png,781,5
+27,934,206,Property Mortgage.png,898,5
+28,1051,206,Property Mortgage.png,1015,5
+29,1168,206,Property Mortgage.png,1132,5
+31,1194,239,Property Mortgage Side.png,1249,196
+32,1194,356,Property Mortgage Side.png,1249,313
+34,1194,590,Property Mortgage Side.png,1249,547
+35,1194,707,Property Mortgage Side.png,1249,664
+37,1194,941,Property Mortgage Side.png,1249,898
+39,1194,1175,Property Mortgage Side.png,1249,1132

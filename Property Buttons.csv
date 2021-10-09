@@ -1,0 +1,29 @@
+location,property type,button texture,button texture mouseover,button x,button y
+1,STREET,Buttons/Property Empty.png,Buttons/Property M.png,1124,1241
+3,STREET,Buttons/Property Empty.png,Buttons/Property M.png,890,1241
+5,RAILROAD,Buttons/Property Empty.png,Buttons/Property M.png,656,1241
+6,STREET,Buttons/Property Empty.png,Buttons/Property M.png,539,1241
+8,STREET,Buttons/Property Empty.png,Buttons/Property M.png,305,1241
+9,STREET,Buttons/Property Empty.png,Buttons/Property M.png,188,1241
+11,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,1124
+12,UTILITY,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,1007
+13,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,890
+14,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,773
+15,RAILROAD,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,656
+16,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,539
+18,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,305
+19,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,-3,188
+21,STREET,Buttons/Property Empty.png,Buttons/Property M.png,187,-3
+23,STREET,Buttons/Property Empty.png,Buttons/Property M.png,421,-3
+24,STREET,Buttons/Property Empty.png,Buttons/Property M.png,538,-3
+25,RAILROAD,Buttons/Property Empty.png,Buttons/Property M.png,655,-3
+26,STREET,Buttons/Property Empty.png,Buttons/Property M.png,772,-3
+27,STREET,Buttons/Property Empty.png,Buttons/Property M.png,889,-3
+28,UTILITY,Buttons/Property Empty.png,Buttons/Property M.png,1006,-3
+29,STREET,Buttons/Property Empty.png,Buttons/Property M.png,1123,-3
+31,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,188
+32,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,305
+34,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,539
+35,RAILROAD,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,656
+37,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,890
+39,STREET,Buttons/Property Side Empty.png,Buttons/Property Side M.png,1241,1124

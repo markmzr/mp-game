@@ -1,28 +1,31 @@
 package realestateempire.screens;
 
-import org.joml.Matrix4f;
+import realestateempire.multiplayer.server.GameSession;
+import realestateempire.screens.multiplayersetup.MultiplayerSetup;
 
-import realestateempire.multiplayer.MultiplayerSession;
-
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static realestateempire.singleplayer.TurnAction.BEGIN_TURN;
 
 public class ScreenState {
 
     private final long window;
-    private final MenuScreen menuScreen;
-    private final SetupScreen setupScreen;
-    private final MultiplayerScreen mpScreen;
+    private final MainMenu mainMenu;
+    private final SingleplayerSetup spSetup;
+    private final MultiplayerSetup mpSetup;
     private final GameScreen gameScreen;
     private Screen screen;
 
     public ScreenState(long window) {
         this.window = window;
-        menuScreen = new MenuScreen();
-        setupScreen = new SetupScreen();
-        mpScreen = new MultiplayerScreen();
-        gameScreen = new GameScreen();
-        screen = menuScreen;
+        Background background = new Background();
+        mainMenu = new MainMenu(background, this::toGameSetup,
+                this::toMultiplayerSetup, this::quitGame);
+        spSetup = new SingleplayerSetup(background, this::toMainMenu,
+                this::toSingleplayerGame);
+        mpSetup = new MultiplayerSetup(background, this::toMainMenu,
+                this::toMultiplayerGame);
+        gameScreen = new GameScreen(this::toMainMenu, this::quitGame);
+        screen = mainMenu;
     }
 
     public void render() {
@@ -34,43 +37,34 @@ public class ScreenState {
     }
 
     public void buttonPressed(double xCursor, double yCursor) {
-        screen.buttonPressed(this, xCursor, yCursor);
+        screen.buttonPressed(xCursor, yCursor);
     }
 
-    public void setToMenuScreen() {
-        menuScreen.setPrevTime(glfwGetTime());
-        screen = menuScreen;
+    private void toMainMenu() {
+        screen = mainMenu;
     }
 
-    void setToMenuScreen(Matrix4f backgroundPosition, double prevTime) {
-        menuScreen.setBackgroundPosition(backgroundPosition);
-        menuScreen.setPrevTime(prevTime);
-        screen = menuScreen;
+    private void toGameSetup() {
+        screen = spSetup;
     }
 
-    void setToSetupScreen(Matrix4f backgroundPosition, double prevTime) {
-        setupScreen.setBackgroundPosition(backgroundPosition);
-        setupScreen.setPrevTime(prevTime);
-        screen = setupScreen;
+    private void toMultiplayerSetup() {
+        screen = mpSetup;
     }
 
-    void setToMultiplayerScreen(Matrix4f backgroundPosition, double prevTime) {
-        mpScreen.setBackgroundPosition(backgroundPosition);
-        mpScreen.setPrevTime(prevTime);
-        screen = mpScreen;
-    }
-
-    void setToGameScreen(int userToken) {
-        gameScreen.initSingleplayerGame(userToken);
+    private void toSingleplayerGame() {
+        gameScreen.initSingleplayerGame(spSetup.getUserToken());
         screen = gameScreen;
     }
 
-    void setToGameScreen(MultiplayerSession mpSession) {
-        gameScreen.initMultiplayerGame(mpSession);
+    private void toMultiplayerGame() {
+        GameSession gameSession = mpSetup.getGameSession();
+        gameScreen.initMultiplayerGame(gameSession);
         screen = gameScreen;
+        gameSession.send("turn-action", BEGIN_TURN);
     }
 
-    public void quitGame() {
+    private void quitGame() {
         glfwSetWindowShouldClose(window, true);
     }
 }

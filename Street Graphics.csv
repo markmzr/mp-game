@@ -1,0 +1,23 @@
+location,house texture,house 1 x,house 1 y,house 2 x,house 2 y,house 3 x,house 3 y,house 4 x,house 4 y,hotel texture,hotel x,hotel y
+1,Tokens/House.png,1217,1253,1190,1253,1163,1253,1136,1253,Tokens/Hotel.png,1163,1253
+3,Tokens/House.png,983,1253,956,1253,929,1253,902,1253,Tokens/Hotel.png,929,1253
+6,Tokens/House.png,632,1253,605,1253,578,1253,551,1253,Tokens/Hotel.png,578,1253
+8,Tokens/House.png,398,1253,371,1253,344,1253,317,1253,Tokens/Hotel.png,344,1253
+9,Tokens/House.png,281,1253,254,1253,227,1253,200,1253,Tokens/Hotel.png,227,1253
+11,Tokens/House Side.png,152,1217,152,1190,152,1163,152,1136,Tokens/Hotel Side.png,152,1163
+13,Tokens/House Side.png,152,983,152,956,152,929,152,902,Tokens/Hotel Side.png,152,929
+14,Tokens/House Side.png,152,866,152,839,152,812,152,785,Tokens/Hotel Side.png,152,812
+16,Tokens/House Side.png,152,632,152,605,152,578,152,551,Tokens/Hotel Side.png,152,578
+18,Tokens/House Side.png,152,398,152,371,152,344,152,317,Tokens/Hotel Side.png,152,344
+19,Tokens/House Side.png,152,281,152,254,152,227,152,200,Tokens/Hotel Side.png,152,227
+21,Tokens/House.png,200,152,227,152,254,152,281,152,Tokens/Hotel.png,227,152
+23,Tokens/House.png,434,152,461,152,488,152,515,152,Tokens/Hotel.png,461,152
+24,Tokens/House.png,551,152,578,152,605,152,632,152,Tokens/Hotel.png,578,152
+26,Tokens/House.png,785,152,812,152,839,152,866,152,Tokens/Hotel.png,812,152
+27,Tokens/House.png,902,152,929,152,956,152,983,152,Tokens/Hotel.png,929,152
+29,Tokens/House.png,1136,152,1163,152,1190,152,1217,152,Tokens/Hotel.png,1163,152
+31,Tokens/House Side.png,1253,200,1253,227,1253,254,1253,281,Tokens/Hotel Side.png,1253,227
+32,Tokens/House Side.png,1253,317,1253,344,1253,371,1253,398,Tokens/Hotel Side.png,1253,344
+34,Tokens/House Side.png,1253,551,1253,578,1253,605,1253,632,Tokens/Hotel Side.png,1253,578
+37,Tokens/House Side.png,1253,902,1253,929,1253,956,1253,983,Tokens/Hotel Side.png,1253,929
+39,Tokens/House Side.png,1253,1136,1253,1163,1253,1190,1253,1217,Tokens/Hotel Side.png,1253,1163
